@@ -2,36 +2,48 @@
 
 可视化的参量均衡器（Parametric Equalizer）界面工具，允许用户通过修改参数和拖动控件来实时调整 EQ 频响曲线。
 
-目前项目处于早期开发阶段，仅完成了 DSP 运算核心。
+目前项目处于早期开发阶段，DSP 运算核心已完成，UI 层待开发。
 
 ## 技术栈
 
 - **语言**: C++ (C++11+)
 - **框架**: Qt (Qt5/Qt6)
-- **算法**: RBJ (Robert Bristow-Johnson) Audio EQ Cookbook 双二阶滤波器
+- **算法**: RBJ (Robert Bristow-Johnson) Audio EQ Cookbook 双二阶滤波器 + Butterworth 滤波器
 
-## 架构概览
+## 架构
 
 ```
-┌──────────┐     ┌──────────────┐     ┌──────────────┐
-│  UI 层    │ ──▶ │ CalculateCore│ ──▶ │  可视化绘图   │
-│ (待开发)  │     │  (DSP 核心)  │     │  (Qt 控件)    │
-└──────────┘     └──────────────┘     └──────────────┘
+                    ┌─────────────────────┐
+                    │    CalculateCore     │
+                    │       (协调器)        │
+                    ├─────────────────────┤
+                    │  频率/Q值查找表       │
+                    │  频响计算 & 叠加      │
+                    │  坐标映射            │
+                    └───────┬─────────────┘
+                            │ dispatches to
+            ┌───────────────┼───────────────┐
+            │               │               │
+    ┌───────▼───────┐ ┌─────▼─────┐ ┌───────▼───────┐
+    │  BiquadFilter │ │ BiquadFilter│ │  BiquadFilter │
+    │   Peaking     │ │ LowShelf   │ │  HighShelf    │
+    └───────────────┘ └─────────────┘ └───────────────┘
+    ┌───────────────┐ ┌─────────────┐
+    │  BiquadFilter │ │ BiquadFilter│
+    │ ButterworthLPF│ │ButterworthHPF│
+    └───────────────┘ └─────────────┘
 ```
 
-### 核心类: `CalculateCore`
+### 类层级
 
-单例 DSP 运算核心，负责所有 EQ 频响曲线的计算。
-
-| 功能 | 说明 |
-|---|---|
-| **滤波器类型** | Peaking (峰值)、Low Shelf (低频搁架)、High Shelf (高频搁架)、Low-Pass (低通)、High-Pass (高通) |
-| **多采样率支持** | 44.1kHz / 48kHz / 96kHz / 192kHz，一次计算预生成四组系数 |
-| **频响计算** | 基于双二阶 IIR Z 传递函数，逐频点计算幅度响应 (dB) |
-| **整合曲线** | 将所有频段的频响 + LPF + HPF 叠加，输出最终 EQ 曲线 |
-| **频率吸附** | 对数刻度频率查找表 (10Hz ~ 48kHz, 446 个点)，支持吸附到最近有效值 |
-| **Q 值吸附** | 对数刻度 Q 值查找表 (0.4 ~ 128 或 0.4 ~ 1.6, 102 个点) |
-| **默认频点** | 15 个 ISO 近似中心频率 (31Hz ~ 19.9kHz) |
+```
+BiquadFilter (抽象基类)
+├── PeakingFilter       — RBJ 峰值均衡
+├── LowShelfFilter      — RBJ 低频搁架
+├── HighShelfFilter     — RBJ 高频搁架
+├── ButterworthLPF      — 2 阶 Butterworth 低通
+└── ButterworthHPF      — 2 阶 Butterworth 高通
+```
 
 ### 数据流
 
@@ -39,28 +51,45 @@
 Point 列表 (type, freq, Q, gain)
         │
         ▼
-MakeCoeffBand() ──▶ TFZ_coefficients (b0, b1, b2, a1, a2)
+CalculateCore::MakeCoeffBand()  ──▶  dispatch to BiquadFilter::MakeCoeff()
         │
         ▼
-FreqResponse() ──▶ {频率 → 增益(dB)} 映射
+TFZ_coefficients (b0, b1, b2, a1, a2)
         │
         ▼
-QTotalFreqResponse() ──▶ QVector<double> (Qt 绘图用坐标)
+CalculateCore::FreqResponse() ──▶ {频率 → 增益(dB)} 映射
+        │
+        ▼
+CalculateCore::QTotalFreqResponse() ──▶ QVector<double> (Qt 绘图用坐标)
 ```
 
-### TFZ_coefficients 结构
+### BiquadFilter 抽象基类
 
 ```cpp
-struct TFZ_coefficients {
-    double b0, b1, b2;  // 分子系数 (零点)
-    double a1, a2;       // 分母系数 (极点)
-    bool blnBypass;      // 旁路标志
+class BiquadFilter {
+public:
+    virtual ~BiquadFilter() = default;
+    // 纯虚函数：计算双二阶滤波器系数
+    virtual TFZ_coefficients MakeCoeff(double freq, double Q, double gain, double fs) = 0;
+    // 模板方法：一次性计算 44.1k/48k/96k/192k 四种采样率的系数
+    QMap<TFZType, TFZ_coefficients> MakeCoeffList(double freq, double Q, double gain, bool bypass = false);
+};
+```
+
+### 添加新滤波器类型
+
+只需继承 `BiquadFilter` 并实现 `MakeCoeff()`：
+
+```cpp
+class MyFilter : public BiquadFilter {
+public:
+    TFZ_coefficients MakeCoeff(double freq, double Q, double gain, double fs) override {
+        // 实现你的双二阶滤波算法
+    }
 };
 ```
 
 ### 坐标映射 (`Actual_to_View`)
-
-将实际频率 (Hz) 通过对数-线性插值映射到视图坐标 [0, 11]:
 
 | 视图坐标 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
 |---------|---|---|---|---|---|---|---|---|---|----|----|----|----|-----|
@@ -70,18 +99,28 @@ struct TFZ_coefficients {
 
 ```
 AudioEQ_Visualized/
-├── exapmle/
-│   ├── CalculateCore.h      # DSP 运算核心头文件 (229 lines)
-│   └── CalculateCore.cpp    # DSP 运算核心实现 (748 lines)
+├── calculator_core/            # 原始代码（保留作为参考）
+│   ├── CalculateCore.h
+│   └── CalculateCore.cpp
+├── AudioEQ/                    # 重构后的代码
+│   ├── DataClass.h             # Point 结构体、BandType 枚举
+│   ├── PublicVar.h             # 全局参数单例 (采样率)
+│   ├── PublicVar.cpp
+│   ├── FilterBase.h            # BiquadFilter 抽象基类 + TFZ_coefficients + TFZType
+│   ├── FilterBase.cpp
+│   ├── PeakingFilter.h/cpp     # RBJ 峰值滤波器
+│   ├── LowShelfFilter.h/cpp    # RBJ 低频搁架滤波器
+│   ├── HighShelfFilter.h/cpp   # RBJ 高频搁架滤波器
+│   ├── ButterworthLPF.h/cpp    # Butterworth 低通滤波器
+│   ├── ButterworthHPF.h/cpp    # Butterworth 高通滤波器
+│   ├── CalculateCore.h         # 协调器（查找表、频响计算、滤波器调度）
+│   └── CalculateCore.cpp
 └── README.md
 ```
 
 ## 依赖
 
-- **Qt** (Qt5 或 Qt6): `QVector`, `QMap`, `QList`, `QJsonDocument`, `qDebug`
-- 依赖项目内部文件（未提交至仓库）:
-  - `DataClass.h` — 定义 `Point` 结构体、`BandType` 枚举
-  - `PublicVar.h` — 定义全局参数 `sample_rate`、`nyquist_pattern`
+- **Qt** (Qt5 或 Qt6): `QVector`, `QMap`, `QList`
 
 ## 待开发功能
 

@@ -1,0 +1,15 @@
+TAP version 13
+# TestButterworthIIR
+ok 1 - initTestCase()
+ok 2 - testPeakGain()
+ok 3 - testLowShelfGain()
+ok 4 - testLowPass()
+ok 5 - testHighPass()
+ok 6 - testQRange()
+ok 7 - testEvaluateAtPureFunction()
+ok 8 - testBypass()
+ok 9 - cleanupTestCase()
+1..9
+# tests 9
+# pass 9
+# fail 0

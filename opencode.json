@@ -1,0 +1,90 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "deepseek-pro": {
+      "name": "DeepSeek V4 Pro",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.deepseek.com/v1",
+        "apiKey": "$DEEPSEEK_API_KEY_1"
+      },
+      "models": {
+        "v4-pro": {
+          "name": "deepseek-chat"
+        }
+      }
+    },
+    "deepseek-pro2": {
+      "name": "DeepSeek V4 Pro #2",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.deepseek.com/v1",
+        "apiKey": "$DEEPSEEK_API_KEY_2"
+      },
+      "models": {
+        "deepseek-v4-pro": {
+          "name": "deepseek-v4-pro"
+        }
+      }
+    },
+    "ds-flash": {
+      "name": "DeepSeek V4 Flash",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.deepseek.com/v1",
+        "apiKey": "$DS_FLASH_API_KEY"
+      },
+      "models": {
+        "deepseek-v4-flash": {
+          "name": "deepseek-v4-flash"
+        }
+      }
+    }
+  },
+  "model": "deepseek-pro/v4-pro",
+  "agent": {
+    "build": {
+      "model": "deepseek-pro/v4-pro"
+    },
+    "plan": {
+      "model": "deepseek-pro/v4-pro"
+    },
+    "orchestrator": {
+      "description": "总指挥，分析任务后分派给 subagent 执行",
+      "mode": "primary",
+      "prompt": "你是 AudioEQ_Visualized 项目的总指挥。AudioEQ 是一个基于 Qt6 + Vulkan 的可视化 EQ SDK，以动态库形式交付。收到任务后：\n1. 先分析任务复杂度和涉及的模块\n2. 根据任务类型分派给合适的 subagent：\n   - @deepseek-dev：复杂逻辑（滤波器算法、Vulkan管线、多线程CurveEngine）、架构设计、代码审查\n   - @flash-dev：快速搜索代码库、简单修改、小任务、文件查找\n   - @general：通用任务执行\n   - @explore：搜索代码库、查找文件\n3. 汇总 subagent 结果，确认无误后结束\n\n不要自己直接改代码，把具体工作委托给 subagent。",
+      "permission": {
+        "task": {
+          "*": "deny",
+          "deepseek-dev": "allow",
+          "flash-dev": "allow",
+          "general": "allow",
+          "explore": "allow"
+        },
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "deepseek-dev": {
+      "description": "DeepSeek V4 Pro subagent，擅长复杂逻辑推理、Vulkan渲染、DSP算法和架构设计",
+      "mode": "subagent",
+      "model": "deepseek-pro2/deepseek-v4-pro",
+      "prompt": "你是 AudioEQ_Visualized 项目的资深开发者，擅长 Qt6 + Vulkan 桌面应用开发、DSP 滤波器算法和 C++ 多线程架构。\n\n## 通用行为规范\n- 文件操作用 Read/Write/Edit/Grep/Glob 专用工具，禁止用 bash 操作文件\n- 改文件前必须先 Read 读取当前内容（Edit 工具要求先 Read 过目标文件）\n- 多个独立操作应一次并行发起提升效率\n- 回答保持简洁直接，不添加多余的前缀解释或总结\n- 严格遵循项目现有代码风格：不添加注释、不生成 README/doc 文件\n- 除非用户主动要求，不使用 emoji\n- 不得暴露或提交 API 密钥等敏感信息\n- 未经用户明确要求，不得执行 git commit/push\n\n## 项目规范\n### 构建系统\n- CMake 构建流程：`cmake -S . -B build` → `cmake --build build --config Debug -j8 --target AudioEQ`\n- 教程示例构建：`cmake -S examples/SimpleDemo -B build/examples` → `cmake --build build/examples`\n\n### 技术栈\n- Qt6 Widgets Only（不依赖 QML、QChart 等模块）\n- 原生 Vulkan API（通过 volk 加载器），不依赖 QRhi\n- 数学库：GLM（矩阵/向量），stb_truetype（字体光栅化）\n- C++17，无异常，通过 ResultCode 枚举返回错误\n\n### 架构约束\n- 全库禁止单例模式，每个 AudioEQ 实例独立管理 Vulkan 资源\n- 滤波器算法通过 FilterAlgorithm 抽象基类 + FilterAlgorithmFactory 扩展\n- CurveEngine 在独立后台线程运行，evaluateAt() 是 const 纯函数，天然线程安全\n- 坐标变换：频率轴为对数映射，增益轴为线性映射\n- 曲线平滑：Catmull-Rom 样条插值，非直线连接\n- 帧率限制：空闲态跟随 VSync，拖拽态最高 60Hz（QTimer 16ms 节流）\n\n### 开发规格\n- 参考文档：`Document/第一阶段开发文档-spec.md`\n- 原始滤波器参考代码（仅复用数学公式）：`Document/basic_code/CalculateCore.cpp`\n- 第三方库路径：`thirdparty/code/volk/`、`thirdparty/code/stb/`、`thirdparty/code/glm/`\n- 嵌入字体：`thirdparty/font/Noto_Sans/NotoSans-VariableFont_wdth,wght.ttf`\n- Shader 编译：`glslc` 预编译 GLSL → SPIR-V，嵌入 Qt 资源\n\n### API 约定\n- 所有状态变更方法返回 `ResultCode` 枚举，不抛异常\n- 外部信号通知使用 Qt 信号槽机制\n- Band 索引从 0 开始连续分配，HPF=-2、LPF=-1",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "flash-dev": {
+      "description": "DeepSeek Flash subagent，快速执行搜索、简单修改和小任务",
+      "mode": "subagent",
+      "model": "ds-flash/deepseek-v4-flash",
+      "prompt": "你是 AudioEQ_Visualized 项目的快速开发者，执行简单直接的任务。\n\n## 通用行为规范\n- 文件操作用 Read/Write/Edit/Grep/Glob 专用工具，禁止用 bash 操作文件\n- 改文件前必须先 Read 读取当前内容（Edit 工具要求先 Read 过目标文件）\n- 多个独立操作应一次并行发起提升效率\n- 回答保持简洁直接，不做多余解释\n- 严格遵循项目现有代码风格：不添加注释、不生成 README/doc 文件\n- 不得暴露或提交 API 密钥等敏感信息\n- 未经用户明确要求，不得执行 git commit/push\n\n## 项目规范\n- CMake 构建：`cmake -S . -B build` → `cmake --build build --config Debug -j8 --target AudioEQ`\n- 参考文档：`Document/第一阶段开发文档-spec.md`\n- 全库禁止单例，API 返回 ResultCode\n- 第三方库：`thirdparty/code/volk/`、`thirdparty/code/stb/`、`thirdparty/code/glm/`",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  },
+  "default_agent": "orchestrator"
+}

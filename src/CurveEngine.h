@@ -1,45 +1,62 @@
 #pragma once
+
 #include <QObject>
 #include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 #include <QVector>
 #include <QPointF>
 #include <atomic>
+#include <memory>
 #include "AudioEQTypes.h"
 
 class FilterAlgorithm;
-class EqualizerModel;
+
+struct CurveRequest {
+    QVector<EQBand> bands;
+    ShelfBand       lpf;
+    ShelfBand       hpf;
+    SampleRate      sampleRate = SampleRate::SR_44100;
+    double          freqMin    = 20.0;
+    double          freqMax    = 22050.0;
+    int             pointCount = 500;
+};
 
 class AUDIOEQ_EXPORT CurveEngine : public QObject {
     Q_OBJECT
 public:
-    explicit CurveEngine(FilterAlgorithm* algo, QObject* parent = nullptr);
-    ~CurveEngine();
+    explicit CurveEngine(QObject* parent = nullptr);
+    ~CurveEngine() override;
 
     void setPointCount(int count);
-    int  pointCount() const;
-    void setFreqRange(double minHz, double maxHz);
-    void setGainRange(double minDb, double maxDb);
 
-    void requestTotalCurve(const EqualizerModel& modelSnapshot);
-    void requestSingleBandCurve(int bandIndex, const EqualizerModel& modelSnapshot);
+    void requestTotalCurve(const CurveRequest& request);
+
+    void requestBandCurve(const CurveRequest& request, int bandIndex);
+
     void cancelPending();
 
 signals:
     void totalCurveReady(QVector<QPointF> points);
-    void singleBandCurveReady(int bandIndex, QVector<QPointF> points);
+    void bandCurveReady(int bandIndex, QVector<QPointF> points);
 
 private:
-    QThread m_workerThread;
-    FilterAlgorithm* m_filterAlgo = nullptr;
-    std::atomic<bool> m_cancelPending{false};
-    int m_pointCount = 500;
-    double m_freqMin = 10.0, m_freqMax = 24000.0;
-    double m_gainMin = -48.0, m_gainMax = 48.0;
+    void startWorker();
+    void stopWorker();
+    void workerLoop();
+    QVector<QPointF> computeTotalCurve(const CurveRequest& req);
+    QVector<QPointF> computeBandCurve(const CurveRequest& req, int bandIndex);
 
-    QVector<double> generateLogFrequencyPoints() const;
-    QVector<QPointF> computeTotalCurveImpl(const QVector<EQBand>& bands, const ShelfBand& lpf,
-                                            const ShelfBand& hpf, double sr) const;
-    QVector<QPointF> computeSingleBandCurveImpl(int bandIndex, const QVector<EQBand>& bands,
-                                                 const ShelfBand& lpf, const ShelfBand& hpf,
-                                                 double sr) const;
+    QThread             m_workerThread;
+    QMutex              m_mutex;
+    QWaitCondition      m_condition;
+    bool                m_running = false;
+
+    bool                m_hasTask = false;
+    bool                m_isTotalCurve = true;
+    CurveRequest        m_request;
+    int                 m_bandIndex = -1;
+
+    std::atomic<bool>   m_cancelPending{false};
+    int                 m_pointCount = 500;
 };

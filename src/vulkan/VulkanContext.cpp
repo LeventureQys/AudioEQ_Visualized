@@ -1,233 +1,163 @@
-#include "vulkan/VulkanContext.h"
+#include "VulkanContext.h"
+
+#include <QDebug>
+#include <set>
 #include <vector>
-#include <cstring>
 
-VulkanContext::VulkanContext()
-{
-	volkInitialize();
+VulkanContext::VulkanContext() = default;
+
+VulkanContext::~VulkanContext() {
+    destroy();
 }
 
-VulkanContext::~VulkanContext()
-{
-	cleanup();
-}
+bool VulkanContext::initialize() {
+    VkResult result = volkInitialize();
+    if (result != VK_SUCCESS) {
+        qWarning() << "VulkanContext: volkInitialize failed with" << result;
+        return false;
+    }
 
-bool VulkanContext::initialize()
-{
-	if (!createInstance()) {
-		return false;
-	}
-	if (!pickPhysicalDevice()) {
-		return false;
-	}
-	if (!createLogicalDevice()) {
-		return false;
-	}
-	return true;
-}
+    m_qtInstance = new QVulkanInstance();
+    m_qtInstance->setApiVersion(QVersionNumber(1, 3, 0));
 
-void VulkanContext::cleanup()
-{
-	if (m_device != VK_NULL_HANDLE) {
-		vkDestroyDevice(m_device, nullptr);
-		m_device = VK_NULL_HANDLE;
-	}
-	if (m_instance != VK_NULL_HANDLE) {
-		vkDestroyInstance(m_instance, nullptr);
-		m_instance = VK_NULL_HANDLE;
-	}
-	m_physicalDevice = VK_NULL_HANDLE;
-	m_graphicsQueue = VK_NULL_HANDLE;
-	m_graphicsQueueFamily = 0;
-	m_msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-}
-
-VkInstance VulkanContext::instance() const
-{
-	return m_instance;
-}
-
-VkPhysicalDevice VulkanContext::physicalDevice() const
-{
-	return m_physicalDevice;
-}
-
-VkDevice VulkanContext::device() const
-{
-	return m_device;
-}
-
-uint32_t VulkanContext::graphicsQueueFamily() const
-{
-	return m_graphicsQueueFamily;
-}
-
-VkQueue VulkanContext::graphicsQueue() const
-{
-	return m_graphicsQueue;
-}
-
-VkSampleCountFlagBits VulkanContext::msaaSamples() const
-{
-	return m_msaaSamples;
-}
-
-bool VulkanContext::isVulkanSupported()
-{
-	VkResult result = volkInitialize();
-	if (result != VK_SUCCESS) {
-		return false;
-	}
-
-	if (vkEnumerateInstanceVersion) {
-		uint32_t apiVersion;
-		result = vkEnumerateInstanceVersion(&apiVersion);
-		return result == VK_SUCCESS;
-	}
-
-	uint32_t extensionCount = 0;
-	result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-	return result == VK_SUCCESS;
-}
-
-bool VulkanContext::createInstance()
-{
-	VkApplicationInfo appInfo{};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "AudioEQ";
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "AudioEQ";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_1;
-
-	std::vector<const char*> extensions;
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-	extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-	extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#ifndef NDEBUG
+    m_qtInstance->setLayers({"VK_LAYER_KHRONOS_validation"});
 #endif
-	if (enableValidationLayers) {
-		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	}
 
-	VkInstanceCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-	createInfo.ppEnabledExtensionNames = extensions.data();
+    if (!m_qtInstance->create()) {
+        qWarning() << "VulkanContext: QVulkanInstance::create() failed";
+        delete m_qtInstance;
+        m_qtInstance = nullptr;
+        return false;
+    }
 
-	if (enableValidationLayers) {
-		const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
-		createInfo.enabledLayerCount = 1;
-		createInfo.ppEnabledLayerNames = validationLayers;
-	}
+    volkLoadInstance(m_qtInstance->vkInstance());
 
-	VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
-	if (result != VK_SUCCESS && enableValidationLayers) {
-		createInfo.enabledLayerCount = 0;
-		createInfo.ppEnabledLayerNames = nullptr;
-		result = vkCreateInstance(&createInfo, nullptr, &m_instance);
-	}
-	if (result != VK_SUCCESS) {
-		return false;
-	}
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(m_qtInstance->vkInstance(), &deviceCount, nullptr);
+    if (deviceCount == 0) {
+        qWarning() << "VulkanContext: No physical devices found";
+        destroy();
+        return false;
+    }
 
-	volkLoadInstance(m_instance);
-	return true;
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(m_qtInstance->vkInstance(), &deviceCount, devices.data());
+
+    m_physicalDevice = devices[0];
+
+    VkPhysicalDeviceProperties deviceProps;
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProps);
+    qDebug() << "VulkanContext: Using physical device:" << deviceProps.deviceName;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    m_graphicsFamily = 0;
+    bool found = false;
+    for (uint32_t i = 0; i < queueFamilyCount; ++i) {
+        if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            m_graphicsFamily = i;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        qWarning() << "VulkanContext: No graphics queue family found";
+        destroy();
+        return false;
+    }
+
+    float queuePriority = 1.0f;
+    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = m_graphicsFamily;
+    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+
+    std::vector<const char*> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    };
+
+    VkPhysicalDeviceFeatures deviceFeatures = {};
+
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+    result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    if (result != VK_SUCCESS) {
+        qWarning() << "VulkanContext: vkCreateDevice failed with" << result;
+        destroy();
+        return false;
+    }
+
+    volkLoadDevice(m_device);
+
+    vkGetDeviceQueue(m_device, m_graphicsFamily, 0, &m_graphicsQueue);
+
+    m_valid = true;
+    qDebug() << "VulkanContext: Initialization complete";
+    return true;
 }
 
-bool VulkanContext::pickPhysicalDevice()
-{
-	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
-	if (deviceCount == 0) {
-		return false;
-	}
+void VulkanContext::destroy() {
+    if (m_device != VK_NULL_HANDLE) {
+        vkDestroyDevice(m_device, nullptr);
+        m_device = VK_NULL_HANDLE;
+    }
 
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+    if (m_qtInstance) {
+        m_qtInstance->destroy();
+        delete m_qtInstance;
+        m_qtInstance = nullptr;
+    }
 
-	for (const auto& device : devices) {
-		VkPhysicalDeviceProperties properties;
-		vkGetPhysicalDeviceProperties(device, &properties);
-
-		uint32_t queueFamilyCount = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-		uint32_t graphicsFamily = 0;
-		bool foundGraphics = false;
-		for (uint32_t i = 0; i < queueFamilyCount; ++i) {
-			if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				graphicsFamily = i;
-				foundGraphics = true;
-				break;
-			}
-		}
-
-		if (!foundGraphics) {
-			continue;
-		}
-
-		m_physicalDevice = device;
-		m_graphicsQueueFamily = graphicsFamily;
-
-		if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-			return true;
-		}
-	}
-
-	if (m_physicalDevice != VK_NULL_HANDLE) {
-		return true;
-	}
-
-	return false;
+    m_physicalDevice = VK_NULL_HANDLE;
+    m_graphicsQueue  = VK_NULL_HANDLE;
+    m_graphicsFamily = 0;
+    m_valid = false;
 }
 
-bool VulkanContext::createLogicalDevice()
-{
-	m_msaaSamples = getMaxUsableSampleCount();
-
-	float queuePriority = 1.0f;
-	VkDeviceQueueCreateInfo queueCreateInfo{};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = m_graphicsQueueFamily;
-	queueCreateInfo.queueCount = 1;
-	queueCreateInfo.pQueuePriorities = &queuePriority;
-
-	VkPhysicalDeviceFeatures deviceFeatures{};
-
-	VkDeviceCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.queueCreateInfoCount = 1;
-	createInfo.pQueueCreateInfos = &queueCreateInfo;
-	createInfo.pEnabledFeatures = &deviceFeatures;
-
-	VkResult result = vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device);
-	if (result != VK_SUCCESS) {
-		return false;
-	}
-
-	volkLoadDevice(m_device);
-	vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
-	return true;
+bool VulkanContext::isValid() const {
+    return m_valid;
 }
 
-VkSampleCountFlagBits VulkanContext::getMaxUsableSampleCount()
-{
-	VkPhysicalDeviceProperties properties;
-	vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
+QVulkanInstance* VulkanContext::qtInstance() const { return m_qtInstance; }
 
-	VkSampleCountFlags counts = properties.limits.framebufferColorSampleCounts
-		& properties.limits.framebufferDepthSampleCounts;
+VkInstance VulkanContext::vkInstance() const {
+    return m_qtInstance ? m_qtInstance->vkInstance() : VK_NULL_HANDLE;
+}
 
-	if (counts & VK_SAMPLE_COUNT_64_BIT) return VK_SAMPLE_COUNT_64_BIT;
-	if (counts & VK_SAMPLE_COUNT_32_BIT) return VK_SAMPLE_COUNT_32_BIT;
-	if (counts & VK_SAMPLE_COUNT_16_BIT) return VK_SAMPLE_COUNT_16_BIT;
-	if (counts & VK_SAMPLE_COUNT_8_BIT)  return VK_SAMPLE_COUNT_8_BIT;
-	if (counts & VK_SAMPLE_COUNT_4_BIT)  return VK_SAMPLE_COUNT_4_BIT;
-	if (counts & VK_SAMPLE_COUNT_2_BIT)  return VK_SAMPLE_COUNT_2_BIT;
+VkPhysicalDevice VulkanContext::physicalDevice() const { return m_physicalDevice; }
+VkDevice         VulkanContext::device()         const { return m_device; }
+VkQueue          VulkanContext::graphicsQueue()  const { return m_graphicsQueue; }
+uint32_t         VulkanContext::graphicsFamily() const { return m_graphicsFamily; }
 
-	return VK_SAMPLE_COUNT_1_BIT;
+bool VulkanContext::isVulkanSupported() {
+    if (volkInitialize() != VK_SUCCESS) {
+        return false;
+    }
+
+    QVulkanInstance tempInstance;
+    tempInstance.setApiVersion(QVersionNumber(1, 3, 0));
+
+    if (!tempInstance.create()) {
+        return false;
+    }
+
+    volkLoadInstance(tempInstance.vkInstance());
+
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(tempInstance.vkInstance(), &deviceCount, nullptr);
+
+    tempInstance.destroy();
+    return deviceCount > 0;
 }

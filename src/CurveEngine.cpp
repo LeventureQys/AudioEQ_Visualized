@@ -1,261 +1,172 @@
 #include "CurveEngine.h"
-#include "EqualizerModel.h"
-#include "CoordinateMapper.h"
 #include "filter/FilterAlgorithm.h"
+#include "filter/FilterAlgorithmFactory.h"
 #include <cmath>
 #include <algorithm>
 
-CurveEngine::CurveEngine(FilterAlgorithm* algo, QObject* parent)
-	: QObject(parent)
-	, m_filterAlgo(algo)
-{
-	moveToThread(&m_workerThread);
-	m_workerThread.start();
+CurveEngine::CurveEngine(QObject* parent) : QObject(parent) {
+    startWorker();
 }
 
-CurveEngine::~CurveEngine()
-{
-	cancelPending();
-	m_workerThread.quit();
-	m_workerThread.wait();
+CurveEngine::~CurveEngine() {
+    stopWorker();
 }
 
-void CurveEngine::setPointCount(int count)
-{
-	if (count < 1)
-		count = 1;
-	m_pointCount = count;
+void CurveEngine::setPointCount(int count) {
+    if (count > 0) m_pointCount = count;
 }
 
-int CurveEngine::pointCount() const
-{
-	return m_pointCount;
+void CurveEngine::requestTotalCurve(const CurveRequest& request) {
+    cancelPending();
+    {
+        QMutexLocker lock(&m_mutex);
+        m_request = request;
+        m_request.pointCount = m_pointCount;
+        m_isTotalCurve = true;
+        m_hasTask = true;
+    }
+    m_condition.wakeOne();
 }
 
-void CurveEngine::setFreqRange(double minHz, double maxHz)
-{
-	m_freqMin = minHz;
-	m_freqMax = maxHz;
+void CurveEngine::requestBandCurve(const CurveRequest& request, int bandIndex) {
+    cancelPending();
+    {
+        QMutexLocker lock(&m_mutex);
+        m_request = request;
+        m_request.pointCount = m_pointCount;
+        m_isTotalCurve = false;
+        m_bandIndex = bandIndex;
+        m_hasTask = true;
+    }
+    m_condition.wakeOne();
 }
 
-void CurveEngine::setGainRange(double minDb, double maxDb)
-{
-	m_gainMin = minDb;
-	m_gainMax = maxDb;
+void CurveEngine::cancelPending() {
+    m_cancelPending.store(true, std::memory_order_release);
 }
 
-void CurveEngine::requestTotalCurve(const EqualizerModel& modelSnapshot)
-{
-	QVector<EQBand> bands = modelSnapshot.allBands();
-	ShelfBand lpf = modelSnapshot.lpf();
-	ShelfBand hpf = modelSnapshot.hpf();
-	double sr = static_cast<double>(static_cast<int>(modelSnapshot.sampleRate()));
-
-	QMetaObject::invokeMethod(this, [this, bands, lpf, hpf, sr]() {
-		if (m_cancelPending.load())
-			return;
-		auto points = computeTotalCurveImpl(bands, lpf, hpf, sr);
-		if (!m_cancelPending.load())
-			emit totalCurveReady(points);
-	}, Qt::QueuedConnection);
+void CurveEngine::startWorker() {
+    m_running = true;
+    QObject::connect(&m_workerThread, &QThread::started, this, [this]() {
+        workerLoop();
+    });
+    moveToThread(&m_workerThread);
+    m_workerThread.start();
 }
 
-void CurveEngine::requestSingleBandCurve(int bandIndex, const EqualizerModel& modelSnapshot)
-{
-	QVector<EQBand> bands = modelSnapshot.allBands();
-	ShelfBand lpf = modelSnapshot.lpf();
-	ShelfBand hpf = modelSnapshot.hpf();
-	double sr = static_cast<double>(static_cast<int>(modelSnapshot.sampleRate()));
-
-	QMetaObject::invokeMethod(this, [this, bandIndex, bands, lpf, hpf, sr]() {
-		if (m_cancelPending.load())
-			return;
-		auto points = computeSingleBandCurveImpl(bandIndex, bands, lpf, hpf, sr);
-		if (!m_cancelPending.load())
-			emit singleBandCurveReady(bandIndex, points);
-	}, Qt::QueuedConnection);
+void CurveEngine::stopWorker() {
+    m_running = false;
+    cancelPending();
+    m_condition.wakeOne();
+    m_workerThread.quit();
+    m_workerThread.wait();
 }
 
-void CurveEngine::cancelPending()
-{
-	m_cancelPending.store(true);
+void CurveEngine::workerLoop() {
+    while (m_running) {
+        {
+            QMutexLocker lock(&m_mutex);
+            while (m_running && !m_hasTask) {
+                m_condition.wait(&m_mutex);
+            }
+            if (!m_running) break;
+        }
+
+        m_cancelPending.store(false, std::memory_order_release);
+
+        CurveRequest req;
+        bool isTotal;
+        int bandIdx;
+        {
+            QMutexLocker lock(&m_mutex);
+            req = m_request;
+            isTotal = m_isTotalCurve;
+            bandIdx = m_bandIndex;
+            m_hasTask = false;
+        }
+
+        QVector<QPointF> points;
+        if (isTotal) {
+            points = computeTotalCurve(req);
+            if (!m_cancelPending.load(std::memory_order_acquire)) {
+                emit totalCurveReady(points);
+            }
+        } else {
+            points = computeBandCurve(req, bandIdx);
+            if (!m_cancelPending.load(std::memory_order_acquire)) {
+                emit bandCurveReady(bandIdx, points);
+            }
+        }
+    }
 }
 
-QVector<double> CurveEngine::generateLogFrequencyPoints() const
-{
-	QVector<double> points;
-	points.reserve(m_pointCount);
+QVector<QPointF> CurveEngine::computeTotalCurve(const CurveRequest& req) {
+    QVector<QPointF> points;
+    points.reserve(req.pointCount);
 
-	if (m_pointCount == 1) {
-		points.append(m_freqMin);
-		return points;
-	}
+    double logMin = std::log(req.freqMin);
+    double logMax = std::log(req.freqMax);
+    double logRange = logMax - logMin;
 
-	double ratio = m_freqMax / m_freqMin;
-	for (int i = 0; i < m_pointCount; ++i) {
-		double t = static_cast<double>(i) / static_cast<double>(m_pointCount - 1);
-		double freq = m_freqMin * std::pow(ratio, t);
-		points.append(freq);
-	}
+    for (int i = 0; i < req.pointCount; ++i) {
+        if (i % 10 == 0 && m_cancelPending.load(std::memory_order_acquire))
+            return {};
 
-	return points;
+        double t = static_cast<double>(i) / (req.pointCount - 1);
+        double freq = req.freqMin * std::exp(t * logRange);
+
+        double x = (std::log(freq) - logMin) / logRange;
+
+        double totalGain = 0.0;
+        for (const auto& band : req.bands) {
+            if (band.bypass) continue;
+            auto algo = FilterAlgorithmFactory::create(band.type, band.algo, band.freqHz, band.gainDb, band.q);
+            if (algo) {
+                totalGain += algo->evaluateAt(freq, static_cast<double>(static_cast<int>(req.sampleRate)));
+            }
+        }
+
+        if (req.lpf.enabled && !req.lpf.bypass) {
+            auto algo = FilterAlgorithmFactory::create(FilterType::LowPass, req.lpf.algo, req.lpf.freqHz, 0.0, 0.7071);
+            if (algo) totalGain += algo->evaluateAt(freq, static_cast<double>(static_cast<int>(req.sampleRate)));
+        }
+
+        if (req.hpf.enabled && !req.hpf.bypass) {
+            auto algo = FilterAlgorithmFactory::create(FilterType::HighPass, req.hpf.algo, req.hpf.freqHz, 0.0, 0.7071);
+            if (algo) totalGain += algo->evaluateAt(freq, static_cast<double>(static_cast<int>(req.sampleRate)));
+        }
+
+        points.append(QPointF(x, totalGain));
+    }
+
+    return points;
 }
 
-QVector<QPointF> CurveEngine::computeTotalCurveImpl(const QVector<EQBand>& bands, const ShelfBand& lpf,
-                                                      const ShelfBand& hpf, double sr) const
-{
-	QVector<double> freqs = generateLogFrequencyPoints();
-	QVector<QPointF> result;
-	result.reserve(freqs.size());
+QVector<QPointF> CurveEngine::computeBandCurve(const CurveRequest& req, int bandIndex) {
+    QVector<QPointF> points;
+    points.reserve(req.pointCount);
 
-	CoordinateMapper mapper(QRect(0, 0, 1, 1), m_freqMin, m_freqMax, m_gainMin, m_gainMax);
+    if (bandIndex < 0 || bandIndex >= req.bands.size()) return points;
 
-	int checkInterval = 16;
-	for (int i = 0; i < freqs.size(); ++i) {
-		if ((i % checkInterval) == 0 && m_cancelPending.load())
-			return QVector<QPointF>();
+    const EQBand& band = req.bands[bandIndex];
 
-		double freq = freqs[i];
-		double gain = 0.0;
+    double logMin = std::log(req.freqMin);
+    double logMax = std::log(req.freqMax);
+    double logRange = logMax - logMin;
 
-		for (const auto& band : bands) {
-			if (!band.bypass)
-				gain += m_filterAlgo->evaluateAt(freq, sr, band);
-		}
+    auto algo = FilterAlgorithmFactory::create(band.type, band.algo, band.freqHz, band.gainDb, band.q);
+    if (!algo) return points;
 
-		if (lpf.enabled) {
-			EQBand lpfBand;
-			lpfBand.type = FilterType::LowPass;
-			lpfBand.frequency = lpf.frequency;
-			lpfBand.algorithm = lpf.algorithm;
-			lpfBand.gain = 0.0;
-			lpfBand.q = 1.0;
-			lpfBand.bypass = false;
-			gain += m_filterAlgo->evaluateAt(freq, sr, lpfBand);
-		}
+    for (int i = 0; i < req.pointCount; ++i) {
+        if (i % 10 == 0 && m_cancelPending.load(std::memory_order_acquire))
+            return {};
 
-		if (hpf.enabled) {
-			EQBand hpfBand;
-			hpfBand.type = FilterType::HighPass;
-			hpfBand.frequency = hpf.frequency;
-			hpfBand.algorithm = hpf.algorithm;
-			hpfBand.gain = 0.0;
-			hpfBand.q = 1.0;
-			hpfBand.bypass = false;
-			gain += m_filterAlgo->evaluateAt(freq, sr, hpfBand);
-		}
+        double t = static_cast<double>(i) / (req.pointCount - 1);
+        double freq = req.freqMin * std::exp(t * logRange);
+        double x = (std::log(freq) - logMin) / logRange;
+        double gain = algo->evaluateAt(freq, static_cast<double>(static_cast<int>(req.sampleRate)));
+        points.append(QPointF(x, gain));
+    }
 
-		double clampedGain = std::clamp(gain, m_gainMin, m_gainMax);
-		double x = mapper.freqToX(freq);
-		double y = mapper.gainToY(clampedGain);
-		result.append(QPointF(x, y));
-	}
-
-	return result;
-}
-
-QVector<QPointF> CurveEngine::computeSingleBandCurveImpl(int bandIndex, const QVector<EQBand>& bands,
-                                                           const ShelfBand& lpf, const ShelfBand& hpf,
-                                                           double sr) const
-{
-	QVector<double> freqs = generateLogFrequencyPoints();
-	QVector<QPointF> result;
-	result.reserve(freqs.size());
-
-	CoordinateMapper mapper(QRect(0, 0, 1, 1), m_freqMin, m_freqMax, m_gainMin, m_gainMax);
-
-	const EQBand* targetBand = nullptr;
-	for (const auto& band : bands) {
-		if (band.index == bandIndex) {
-			targetBand = &band;
-			break;
-		}
-	}
-
-	if (targetBand && targetBand->bypass) {
-		double yZero = mapper.gainToY(0.0);
-		for (int i = 0; i < freqs.size(); ++i) {
-			double x = mapper.freqToX(freqs[i]);
-			result.append(QPointF(x, yZero));
-		}
-		return result;
-	}
-
-	if (bandIndex == -2) {
-		if (!lpf.enabled) {
-			double yZero = mapper.gainToY(0.0);
-			for (int i = 0; i < freqs.size(); ++i) {
-				double x = mapper.freqToX(freqs[i]);
-				result.append(QPointF(x, yZero));
-			}
-			return result;
-		}
-		for (int i = 0; i < freqs.size(); ++i) {
-			double freq = freqs[i];
-			EQBand lpfBand;
-			lpfBand.type = FilterType::LowPass;
-			lpfBand.frequency = lpf.frequency;
-			lpfBand.algorithm = lpf.algorithm;
-			lpfBand.gain = 0.0;
-			lpfBand.q = 1.0;
-			lpfBand.bypass = false;
-			double gain = m_filterAlgo->evaluateAt(freq, sr, lpfBand);
-			double clampedGain = std::clamp(gain, m_gainMin, m_gainMax);
-			double x = mapper.freqToX(freq);
-			double y = mapper.gainToY(clampedGain);
-			result.append(QPointF(x, y));
-		}
-		return result;
-	}
-
-	if (bandIndex == -1) {
-		if (!hpf.enabled) {
-			double yZero = mapper.gainToY(0.0);
-			for (int i = 0; i < freqs.size(); ++i) {
-				double x = mapper.freqToX(freqs[i]);
-				result.append(QPointF(x, yZero));
-			}
-			return result;
-		}
-		for (int i = 0; i < freqs.size(); ++i) {
-			double freq = freqs[i];
-			EQBand hpfBand;
-			hpfBand.type = FilterType::HighPass;
-			hpfBand.frequency = hpf.frequency;
-			hpfBand.algorithm = hpf.algorithm;
-			hpfBand.gain = 0.0;
-			hpfBand.q = 1.0;
-			hpfBand.bypass = false;
-			double gain = m_filterAlgo->evaluateAt(freq, sr, hpfBand);
-			double clampedGain = std::clamp(gain, m_gainMin, m_gainMax);
-			double x = mapper.freqToX(freq);
-			double y = mapper.gainToY(clampedGain);
-			result.append(QPointF(x, y));
-		}
-		return result;
-	}
-
-	if (!targetBand) {
-		double yZero = mapper.gainToY(0.0);
-		for (int i = 0; i < freqs.size(); ++i) {
-			double x = mapper.freqToX(freqs[i]);
-			result.append(QPointF(x, yZero));
-		}
-		return result;
-	}
-
-	int checkInterval = 16;
-	for (int i = 0; i < freqs.size(); ++i) {
-		if ((i % checkInterval) == 0 && m_cancelPending.load())
-			return QVector<QPointF>();
-
-		double freq = freqs[i];
-		double gain = m_filterAlgo->evaluateAt(freq, sr, *targetBand);
-		double clampedGain = std::clamp(gain, m_gainMin, m_gainMax);
-		double x = mapper.freqToX(freq);
-		double y = mapper.gainToY(clampedGain);
-		result.append(QPointF(x, y));
-	}
-
-	return result;
+    return points;
 }

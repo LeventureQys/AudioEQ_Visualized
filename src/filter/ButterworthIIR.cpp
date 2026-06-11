@@ -1,182 +1,119 @@
-#include "filter/ButterworthIIR.h"
+#include "ButterworthIIR.h"
 #include <cmath>
+#include <algorithm>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-double ButterworthIIR::evaluateAt(double freqHz, double sampleRate, const EQBand& band) const
-{
-	if (band.bypass)
-		return 0.0;
+ButterworthIIR::ButterworthIIR(FilterType type, double freqHz, double gainDb, double q)
+    : m_type(type), m_freqHz(freqHz), m_gainDb(gainDb), m_q(q) {}
 
-	if (freqHz <= 0.0 || sampleRate <= 0.0)
-		return 0.0;
-
-	BiquadCoeff coeff;
-	switch (band.type) {
-	case FilterType::Peak:
-		coeff = makePeakFilter(band.frequency, band.q, band.gain, sampleRate);
-		break;
-	case FilterType::LowShelf:
-		coeff = makeLowShelf(band.frequency, band.q, band.gain, sampleRate);
-		break;
-	case FilterType::HighShelf:
-		coeff = makeHighShelf(band.frequency, band.q, band.gain, sampleRate);
-		break;
-	case FilterType::LowPass:
-		coeff = makeLowPass(band.frequency, sampleRate);
-		break;
-	case FilterType::HighPass:
-		coeff = makeHighPass(band.frequency, sampleRate);
-		break;
-	default:
-		return 0.0;
-	}
-
-	return freqResponseGain(coeff, freqHz, sampleRate);
+double ButterworthIIR::evaluateAt(double freqHz, double sampleRate) const {
+    if (freqHz <= 0.0 || sampleRate <= 0.0) return 0.0;
+    Coeffs c = computeCoeffs(sampleRate);
+    return freqResponseDb(c, freqHz, sampleRate);
 }
 
-QPair<double, double> ButterworthIIR::qRange(FilterType filterType) const
-{
-	switch (filterType) {
-	case FilterType::Peak:       return {0.4, 128.0};
-	case FilterType::LowShelf:
-	case FilterType::HighShelf:  return {0.4, 1.6};
-	case FilterType::LowPass:
-	case FilterType::HighPass:
-	case FilterType::BandPass:   return {0.4, 128.0};
-	}
-	return {0.4, 128.0};
+ButterworthIIR::Coeffs ButterworthIIR::computeCoeffs(double sampleRate) const {
+    switch (m_type) {
+        case FilterType::Peak:      return makePeakFilter(m_freqHz, m_q, m_gainDb, sampleRate);
+        case FilterType::LowShelf:  return makeLowShelf(m_freqHz, m_q, m_gainDb, sampleRate);
+        case FilterType::HighShelf: return makeHighShelf(m_freqHz, m_q, m_gainDb, sampleRate);
+        case FilterType::LowPass:   return makeLowPass(m_freqHz, sampleRate);
+        case FilterType::HighPass:  return makeHighPass(m_freqHz, sampleRate);
+    }
+    return {1, 0, 0, 0, 0};
 }
 
-ButterworthIIR::BiquadCoeff ButterworthIIR::makePeakFilter(double freq, double q, double gain, double sampleRate) const
-{
-	double A = std::pow(10.0, gain / 40.0);
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double cos_omega = std::cos(omega);
-	double sin_omega = std::sin(omega);
-	double alpha = sin_omega / (2.0 * q);
+ButterworthIIR::Coeffs ButterworthIIR::makePeakFilter(double freq, double q, double gain, double sr) {
+    double A  = std::pow(10.0, gain / 40.0);
+    double w0 = 2.0 * M_PI * freq / sr;
+    double cosW = std::cos(w0);
+    double alpha = std::sin(w0) / (2.0 * q);
 
-	double b0 = 1.0 + alpha * A;
-	double b1 = -2.0 * cos_omega;
-	double b2 = 1.0 - alpha * A;
-	double a0 = 1.0 + alpha / A;
-	double a1 = -2.0 * cos_omega;
-	double a2 = 1.0 - alpha / A;
+    double b0 =  1.0 + alpha * A;
+    double b1 = -2.0 * cosW;
+    double b2 =  1.0 - alpha * A;
+    double a0 =  1.0 + alpha / A;
+    double a1 = -2.0 * cosW;
+    double a2 =  1.0 - alpha / A;
 
-	b0 /= a0;
-	b1 /= a0;
-	b2 /= a0;
-	a1 /= a0;
-	a2 /= a0;
-
-	return {b0, b1, b2, a1, a2};
+    return {b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0};
 }
 
-ButterworthIIR::BiquadCoeff ButterworthIIR::makeLowShelf(double freq, double q, double gain, double sampleRate) const
-{
-	double A = std::pow(10.0, gain / 40.0);
-	double aminus1 = A - 1.0;
-	double aplus1 = A + 1.0;
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double coso = std::cos(omega);
-	double beta = std::sin(omega) * std::sqrt(A) / q;
+ButterworthIIR::Coeffs ButterworthIIR::makeLowShelf(double freq, double q, double gain, double sr) {
+    double A  = std::pow(10.0, gain / 40.0);
+    double w0 = 2.0 * M_PI * freq / sr;
+    double cosW = std::cos(w0);
+    double alpha = std::sin(w0) / 2.0 * std::sqrt((A + 1.0 / A) * (1.0 / q - 1.0) + 2.0);
 
-	double aminus1TimesCoso = aminus1 * coso;
-	double aplus1TimesCoso = aplus1 * coso;
-	double a0 = aplus1 + aminus1TimesCoso + beta;
+    double b0 =      A * ((A + 1.0) - (A - 1.0) * cosW + alpha);
+    double b1 =  2.0 * A * ((A - 1.0) - (A + 1.0) * cosW);
+    double b2 =      A * ((A + 1.0) - (A - 1.0) * cosW - alpha);
+    double a0 =           (A + 1.0) + (A - 1.0) * cosW + alpha;
+    double a1 =     -2.0 * ((A - 1.0) + (A + 1.0) * cosW);
+    double a2 =           (A + 1.0) + (A - 1.0) * cosW - alpha;
 
-	double b0 = (A * (aplus1 - aminus1TimesCoso + beta)) / a0;
-	double b1 = (2.0 * A * (aminus1 - aplus1TimesCoso)) / a0;
-	double b2 = (A * (aplus1 - aminus1TimesCoso - beta)) / a0;
-	double a1 = (-2.0 * (aminus1 + aplus1TimesCoso)) / a0;
-	double a2 = (aplus1 + aminus1TimesCoso - beta) / a0;
-
-	return {b0, b1, b2, a1, a2};
+    return {b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0};
 }
 
-ButterworthIIR::BiquadCoeff ButterworthIIR::makeHighShelf(double freq, double q, double gain, double sampleRate) const
-{
-	double A = std::pow(10.0, gain / 40.0);
-	double aminus1 = A - 1.0;
-	double aplus1 = A + 1.0;
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double coso = std::cos(omega);
-	double beta = std::sin(omega) * std::sqrt(A) / q;
+ButterworthIIR::Coeffs ButterworthIIR::makeHighShelf(double freq, double q, double gain, double sr) {
+    double A  = std::pow(10.0, gain / 40.0);
+    double w0 = 2.0 * M_PI * freq / sr;
+    double cosW = -std::cos(w0);
+    double alpha = std::sin(w0) / 2.0 * std::sqrt((A + 1.0 / A) * (1.0 / q - 1.0) + 2.0);
 
-	double aminus1TimesCoso = aminus1 * coso;
-	double aplus1TimesCoso = aplus1 * coso;
-	double a0 = aplus1 - aminus1TimesCoso + beta;
+    double b0 =      A * ((A + 1.0) + (A - 1.0) * cosW + alpha);
+    double b1 = -2.0 * A * ((A - 1.0) + (A + 1.0) * cosW);
+    double b2 =      A * ((A + 1.0) + (A - 1.0) * cosW - alpha);
+    double a0 =           (A + 1.0) - (A - 1.0) * cosW + alpha;
+    double a1 =      2.0 * ((A - 1.0) - (A + 1.0) * cosW);
+    double a2 =           (A + 1.0) - (A - 1.0) * cosW - alpha;
 
-	double b0 = (A * (aplus1 + aminus1TimesCoso + beta)) / a0;
-	double b1 = (-2.0 * A * (aminus1 + aplus1TimesCoso)) / a0;
-	double b2 = (A * (aplus1 + aminus1TimesCoso - beta)) / a0;
-	double a1 = (2.0 * (aminus1 - aplus1TimesCoso)) / a0;
-	double a2 = (aplus1 - aminus1TimesCoso - beta) / a0;
-
-	return {b0, b1, b2, a1, a2};
+    return {b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0};
 }
 
-ButterworthIIR::BiquadCoeff ButterworthIIR::makeLowPass(double freq, double sampleRate) const
-{
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double cos_omega = std::cos(omega);
-	double sin_omega = std::sin(omega);
-	double alpha = sin_omega / std::sqrt(2.0);
+ButterworthIIR::Coeffs ButterworthIIR::makeLowPass(double freq, double sr) {
+    double w0 = 2.0 * M_PI * freq / sr;
+    double cosW = std::cos(w0);
+    double alpha = std::sin(w0) / (2.0 * 0.7071);
 
-	double b0 = (1.0 - cos_omega) / 2.0;
-	double b1 = 1.0 - cos_omega;
-	double b2 = (1.0 - cos_omega) / 2.0;
-	double a0 = 1.0 + alpha;
-	double a1 = -2.0 * cos_omega;
-	double a2 = 1.0 - alpha;
+    double b0 = (1.0 - cosW) / 2.0;
+    double b1 =  1.0 - cosW;
+    double b2 = (1.0 - cosW) / 2.0;
+    double a0 =  1.0 + alpha;
+    double a1 = -2.0 * cosW;
+    double a2 =  1.0 - alpha;
 
-	b0 /= a0;
-	b1 /= a0;
-	b2 /= a0;
-	a1 /= a0;
-	a2 /= a0;
-
-	return {b0, b1, b2, a1, a2};
+    return {b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0};
 }
 
-ButterworthIIR::BiquadCoeff ButterworthIIR::makeHighPass(double freq, double sampleRate) const
-{
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double cos_omega = std::cos(omega);
-	double sin_omega = std::sin(omega);
-	double alpha = sin_omega / std::sqrt(2.0);
+ButterworthIIR::Coeffs ButterworthIIR::makeHighPass(double freq, double sr) {
+    double w0 = 2.0 * M_PI * freq / sr;
+    double cosW = std::cos(w0);
+    double alpha = std::sin(w0) / (2.0 * 0.7071);
 
-	double b0 = (1.0 + cos_omega) / 2.0;
-	double b1 = -(1.0 + cos_omega);
-	double b2 = (1.0 + cos_omega) / 2.0;
-	double a0 = 1.0 + alpha;
-	double a1 = -2.0 * cos_omega;
-	double a2 = 1.0 - alpha;
+    double b0 =  (1.0 + cosW) / 2.0;
+    double b1 = -(1.0 + cosW);
+    double b2 =  (1.0 + cosW) / 2.0;
+    double a0 =   1.0 + alpha;
+    double a1 =  -2.0 * cosW;
+    double a2 =   1.0 - alpha;
 
-	b0 /= a0;
-	b1 /= a0;
-	b2 /= a0;
-	a1 /= a0;
-	a2 /= a0;
-
-	return {b0, b1, b2, a1, a2};
+    return {b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0};
 }
 
-double ButterworthIIR::freqResponseGain(const BiquadCoeff& coeff, double freq, double sampleRate) const
-{
-	double omega = 2.0 * M_PI * freq / sampleRate;
-	double cos_omega = std::cos(omega);
-	double cos_2omega = std::cos(2.0 * omega);
+double ButterworthIIR::freqResponseDb(const Coeffs& c, double freqHz, double sampleRate) {
+    double w = 2.0 * M_PI * freqHz / sampleRate;
+    double phi = 4.0 * std::sin(w / 2.0) * std::sin(w / 2.0);
 
-	double numerator = coeff.b0 * coeff.b0 + coeff.b1 * coeff.b1 + coeff.b2 * coeff.b2
-		+ 2.0 * (coeff.b0 * coeff.b1 + coeff.b1 * coeff.b2) * cos_omega
-		+ 2.0 * coeff.b0 * coeff.b2 * cos_2omega;
+    double b0 = c.b0, b1 = c.b1, b2 = c.b2;
+    double a1 = c.a1, a2 = c.a2;
 
-	double denominator = 1.0 + coeff.a1 * coeff.a1 + coeff.a2 * coeff.a2
-		+ 2.0 * (coeff.a1 + coeff.a1 * coeff.a2) * cos_omega
-		+ 2.0 * coeff.a2 * cos_2omega;
+    double num = (b0 + b1 + b2) * (b0 + b1 + b2) + phi * (b0 * b2 * phi - b1 * (b0 + b2) - 4.0 * b0 * b2);
+    double den = (1.0 + a1 + a2) * (1.0 + a1 + a2) + phi * (a2 * phi - a1 * (1.0 + a2) - 4.0 * a2);
 
-	return 10.0 * std::log10(numerator / denominator);
+    if (den <= 0.0) return -200.0;
+    return 10.0 * std::log10(num / den);
 }

@@ -1,55 +1,39 @@
 #pragma once
-#include <volk.h>
-#include <QHash>
+
+#include "volk.h"
 #include <QRectF>
-#include <QImage>
+#include <QMap>
+#include <QChar>
 
 class VulkanContext;
 
-struct GlyphMetrics {
-	QRectF texCoords;
-	QRectF quadRect;
-	float advanceX = 0;
+struct GlyphInfo {
+    QRectF  uvRect;
+    QRectF  bearingRect;
+    float   advance;
 };
 
 class VulkanFontAtlas {
 public:
-	VulkanFontAtlas();
-	~VulkanFontAtlas();
+    explicit VulkanFontAtlas(VulkanContext* ctx);
+    ~VulkanFontAtlas();
 
-	VulkanFontAtlas(const VulkanFontAtlas&) = delete;
-	VulkanFontAtlas& operator=(const VulkanFontAtlas&) = delete;
+    bool initialize(float fontSize = 14.0f);
 
-	bool initialize(VulkanContext* ctx, const QByteArray& fontData, float fontSize, float devicePixelRatio = 1.0f);
-	void cleanup();
+    void destroy();
 
-	VkImage image() const;
-	VkImageView imageView() const;
-	VkSampler sampler() const;
-	VkExtent2D atlasSize() const;
+    bool glyphInfo(QChar ch, GlyphInfo* out) const;
 
-	const GlyphMetrics& glyphMetrics(QChar ch) const;
-	bool hasGlyph(QChar ch) const;
+    VkImageView  atlasImageView()  const;
+    VkSampler    atlasSampler()    const;
 
 private:
-	VulkanContext* m_context = nullptr;
+    VulkanContext*          m_ctx;
+    VkImage                 m_atlasImage  = VK_NULL_HANDLE;
+    VkDeviceMemory          m_atlasMemory = VK_NULL_HANDLE;
+    VkImageView             m_atlasView   = VK_NULL_HANDLE;
+    VkSampler               m_sampler     = VK_NULL_HANDLE;
+    QMap<QChar, GlyphInfo>  m_glyphs;
 
-	VkImage m_atlasImage = VK_NULL_HANDLE;
-	VkDeviceMemory m_atlasMemory = VK_NULL_HANDLE;
-	VkImageView m_atlasImageView = VK_NULL_HANDLE;
-	VkSampler m_sampler = VK_NULL_HANDLE;
-	VkExtent2D m_atlasSize{};
-
-	QHash<QChar, GlyphMetrics> m_glyphs;
-
-	struct {
-		VkBuffer stagingBuffer = VK_NULL_HANDLE;
-		VkDeviceMemory stagingMemory = VK_NULL_HANDLE;
-	} m_staging;
-
-	bool createAtlasImage();
-	bool rasterizeFont(const QByteArray& fontData, float fontSize, float dpr);
-	bool uploadAtlas(const QImage& atlas);
-	bool createSampler();
-	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    void createAtlasTexture(int width, int height, const unsigned char* data);
 };

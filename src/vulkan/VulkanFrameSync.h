@@ -1,33 +1,33 @@
 #pragma once
-#include <volk.h>
-#include <QVector>
+
+#include "volk.h"
+#include <vector>
 
 class VulkanContext;
-class VulkanSwapchain;
 
 class VulkanFrameSync {
 public:
-	static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-	VulkanFrameSync();
-	~VulkanFrameSync();
+    explicit VulkanFrameSync(VulkanContext* ctx);
+    ~VulkanFrameSync();
 
-	VulkanFrameSync(const VulkanFrameSync&) = delete;
-	VulkanFrameSync& operator=(const VulkanFrameSync&) = delete;
+    bool create();
+    void destroy();
 
-	bool initialize(VulkanContext* ctx, VulkanSwapchain* swapchain);
-	void cleanup();
+    VkSemaphore imageAvailableSemaphore(int frameIndex) const;
+    VkSemaphore renderFinishedSemaphore(int frameIndex) const;
+    VkFence     inFlightFence(int frameIndex) const;
 
-	void beginFrame(uint32_t* imageIndex);
-	void submitFrame(uint32_t imageIndex, VkCommandBuffer cmd, VkQueue presentQueue);
+    void waitAndResetFence(int frameIndex);
+
+    int currentFrame() const;
+    void advanceFrame();
 
 private:
-	VulkanContext* m_context = nullptr;
-	VulkanSwapchain* m_swapchain = nullptr;
-
-	QVector<VkSemaphore> m_imageAvailableSemaphores;
-	QVector<VkSemaphore> m_renderFinishedSemaphores;
-	QVector<VkFence> m_inFlightFences;
-	QVector<VkFence> m_imagesInFlight;
-	int m_currentFrame = 0;
+    VulkanContext*              m_ctx;
+    std::vector<VkSemaphore>    m_imageAvailable;
+    std::vector<VkSemaphore>    m_renderFinished;
+    std::vector<VkFence>        m_inFlightFences;
+    int                         m_currentFrame = 0;
 };

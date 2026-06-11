@@ -1,49 +1,51 @@
 #pragma once
-#include <QWidget>
-#include <QPoint>
-#include <QTimer>
 
-#if defined(AUDIOEQ_LIBRARY)
-#  define AUDIOEQ_EXPORT Q_DECL_EXPORT
-#else
-#  define AUDIOEQ_EXPORT Q_DECL_IMPORT
+#include <QWidget>
+#include <QTimer>
+#include <QPoint>
+
+#ifndef AUDIOEQ_EXPORT
+  #ifdef _WIN32
+    #define AUDIOEQ_EXPORT __declspec(dllimport)
+  #else
+    #define AUDIOEQ_EXPORT
+  #endif
 #endif
 
 class AUDIOEQ_EXPORT BandHandle : public QWidget {
     Q_OBJECT
+
 public:
     explicit BandHandle(int bandIndex, QWidget* parent = nullptr);
 
+    void setCenter(QPoint center);
+    QPoint center() const;
+
     int bandIndex() const;
-    void setPosition(const QPoint& viewportPos);
 
-    bool isDragging() const;
-    bool isFocused() const;
-    void setFocused(bool focused);
-
-    QSize sizeHint() const override;
+    static constexpr int HANDLE_RADIUS = 20;
 
 signals:
-    void bandDragged(int index, QPoint deltaPixels);
-    void bandPressed(int index);
-    void bandDeselected();
+    void bandDragged(int bandIndex, double deltaX, double deltaY);
+    void bandClicked(int bandIndex);
+    void bandReleased(int bandIndex);
 
 protected:
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event)   override;
+    void mouseMoveEvent(QMouseEvent* event)    override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent* event)        override;
+
+    void firePendingDrag();
+
+    QPoint  m_lastEmitPos;
+    bool    m_dragging    = false;
+    QTimer  m_throttleTimer;
+    QPoint  m_pendingDelta;
+    bool    m_hasPending  = false;
 
 private:
-    int m_bandIndex;
-    bool m_focused = false;
-    bool m_dragging = false;
-    QPoint m_centerPos;
-    QPoint m_dragStartPos;
-    QTimer m_dragTimer;
-
-    static constexpr int kBandRadius = 12;
-    static constexpr int kHitRadius = 16;
-
-    void processDrag();
+    int     m_bandIndex;
+    QPoint  m_center;
+    QPoint  m_dragStartPos;
 };

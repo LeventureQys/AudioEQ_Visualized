@@ -1,213 +1,203 @@
 #include "EqualizerModel.h"
-#include <cmath>
+#include <algorithm>
 
-EqualizerModel::EqualizerModel(QObject* parent)
-    : QObject(parent)
-{
-    setBandCount(5);
+EqualizerModel::EqualizerModel(QObject* parent) : QObject(parent) {
+    m_lpf.freqHz  = 20000.0;
+    m_lpf.enabled = false;
+    m_hpf.freqHz  = 20.0;
+    m_hpf.enabled = false;
+
+    m_qRanges[FilterType::Peak]      = {0.1, 10.0};
+    m_qRanges[FilterType::LowShelf]  = {0.1, 10.0};
+    m_qRanges[FilterType::HighShelf] = {0.1, 10.0};
+    m_qRanges[FilterType::LowPass]   = {0.1, 10.0};
+    m_qRanges[FilterType::HighPass]  = {0.1, 10.0};
 }
 
-int EqualizerModel::bandCount() const
-{
-    return m_bands.size();
+// ── Private helpers ────────────────────────────
+int EqualizerModel::findFreeIndex() const {
+    return static_cast<int>(m_bands.size());
 }
 
-ResultCode EqualizerModel::setBandCount(int count)
-{
-    if (count < 0)
-        return ResultCode::InvalidParameter;
+bool EqualizerModel::isValidIndex(int index) const {
+    return index >= 0 && index < m_bands.size();
+}
 
-    m_bands.clear();
-    m_bands.reserve(count);
+// ── Band CRUD ──────────────────────────────────
+int EqualizerModel::bandCount() const {
+    return static_cast<int>(m_bands.size());
+}
 
-    for (int i = 0; i < count; ++i) {
-        EQBand band;
-        band.index = i;
-        if (count > 1)
-            band.frequency = 20.0 * std::pow(20000.0 / 20.0, double(i) / double(count - 1));
-        else
-            band.frequency = 1000.0;
-        band.type = FilterType::Peak;
-        band.algorithm = FilterAlgorithmType::ButterworthIIR;
-        band.gain = 0.0;
-        band.q = 1.0;
-        m_bands.append(band);
-    }
-
-    m_nextIndex = count;
-    if (m_focusedBandIndex >= count)
-        m_focusedBandIndex = -1;
-
-    emit bandCountChanged(count);
-    emit modelReset();
+ResultCode EqualizerModel::addBand(const EQBand& band, int* outIndex) {
+    int idx = static_cast<int>(m_bands.size());
+    m_bands.append(band);
+    if (outIndex) *outIndex = idx;
+    emit bandAdded(idx);
     return ResultCode::OK;
 }
 
-ResultCode EqualizerModel::addBand(const EQBand& band, int* outIndex)
-{
-    int assignedIndex = m_nextIndex++;
-    EQBand newBand = band;
-    newBand.index = assignedIndex;
-    m_bands.append(newBand);
-
-    if (outIndex)
-        *outIndex = assignedIndex;
-
-    emit bandAdded(assignedIndex);
-    emit bandCountChanged(m_bands.size());
+ResultCode EqualizerModel::removeBand(int index) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands.removeAt(index);
+    if (m_focusedIdx == index) {
+        m_focusedIdx = -1;
+        emit focusedBandChanged(-1);
+    }
+    emit bandRemoved(index);
     return ResultCode::OK;
 }
 
-ResultCode EqualizerModel::removeBand(int index)
-{
-    for (int i = 0; i < m_bands.size(); ++i) {
-        if (m_bands[i].index == index) {
-            m_bands.removeAt(i);
-            if (m_focusedBandIndex == index)
-                m_focusedBandIndex = -1;
-            emit bandRemoved(index);
-            emit bandCountChanged(m_bands.size());
-            return ResultCode::OK;
-        }
-    }
-    return ResultCode::IndexOutOfRange;
+EQBand EqualizerModel::band(int index) const {
+    if (!isValidIndex(index)) return EQBand{};
+    return m_bands.at(index);
 }
 
-const EQBand& EqualizerModel::bandAt(int index) const
-{
-    for (const auto& band : m_bands) {
-        if (band.index == index)
-            return band;
-    }
-    static EQBand s_invalid;
-    return s_invalid;
-}
-
-ResultCode EqualizerModel::setBandParams(int index, const EQBand& params)
-{
-    for (auto& band : m_bands) {
-        if (band.index == index) {
-            band.frequency  = params.frequency;
-            band.gain       = params.gain;
-            band.q          = params.q;
-            band.type       = params.type;
-            band.algorithm  = params.algorithm;
-            band.bypass     = params.bypass;
-            emit bandChanged(index);
-            return ResultCode::OK;
-        }
-    }
-    return ResultCode::IndexOutOfRange;
-}
-
-QVector<EQBand> EqualizerModel::allBands() const
-{
-    return m_bands;
-}
-
-int EqualizerModel::focusedBandIndex() const
-{
-    return m_focusedBandIndex;
-}
-
-void EqualizerModel::setFocusedBandIndex(int index)
-{
-    bool valid = false;
-    for (const auto& band : m_bands) {
-        if (band.index == index) {
-            valid = true;
-            break;
-        }
-    }
-    if (index == -1)
-        valid = true;
-
-    if (valid) {
-        m_focusedBandIndex = index;
-        emit focusedBandChanged(index);
-    }
-}
-
-ResultCode EqualizerModel::moveBandZOrder(int fromIndex, int toIndex)
-{
-    int fromPos = -1, toPos = -1;
-    for (int i = 0; i < m_bands.size(); ++i) {
-        if (m_bands[i].index == fromIndex)
-            fromPos = i;
-        if (m_bands[i].index == toIndex)
-            toPos = i;
-    }
-
-    if (fromPos < 0 || toPos < 0)
-        return ResultCode::IndexOutOfRange;
-
-    m_bands.move(fromPos, toPos);
-
-    for (int i = 0; i < m_bands.size(); ++i)
-        m_bands[i].index = i;
-
-    m_nextIndex = m_bands.size();
-    if (m_focusedBandIndex == fromIndex)
-        m_focusedBandIndex = toPos;
-    else if (m_focusedBandIndex == toIndex)
-        m_focusedBandIndex = fromPos;
-
-    emit bandChanged(toPos);
-    emit bandChanged(fromPos);
+ResultCode EqualizerModel::setBand(int index, const EQBand& params) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands[index] = params;
+    emit bandChanged(index);
     return ResultCode::OK;
 }
 
-SampleRate EqualizerModel::sampleRate() const
-{
-    return m_sampleRate;
-}
-
-ResultCode EqualizerModel::setSampleRate(SampleRate rate)
-{
-    m_sampleRate = rate;
-    emit sampleRateChanged(rate);
+ResultCode EqualizerModel::setBandFrequency(int index, double freqHz) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    if (freqHz <= 0.0) return ResultCode::InvalidParameter;
+    m_bands[index].freqHz = freqHz;
+    emit bandChanged(index);
     return ResultCode::OK;
 }
 
-double EqualizerModel::nyquistFrequency() const
-{
-    return static_cast<double>(static_cast<int>(m_sampleRate)) / 2.0;
-}
-
-ShelfBand EqualizerModel::lpf() const
-{
-    return m_lpf;
-}
-
-ResultCode EqualizerModel::setLpf(const ShelfBand& lpf)
-{
-    m_lpf = lpf;
-    emit lpfChanged();
+ResultCode EqualizerModel::setBandGain(int index, double gainDb) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands[index].gainDb = gainDb;
+    emit bandChanged(index);
     return ResultCode::OK;
 }
 
-ShelfBand EqualizerModel::hpf() const
-{
-    return m_hpf;
-}
-
-ResultCode EqualizerModel::setHpf(const ShelfBand& hpf)
-{
-    m_hpf = hpf;
-    emit hpfChanged();
+ResultCode EqualizerModel::setBandQ(int index, double q) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    if (q <= 0.0) return ResultCode::InvalidParameter;
+    m_bands[index].q = q;
+    emit bandChanged(index);
     return ResultCode::OK;
 }
 
-ResultCode EqualizerModel::setLpfEnabled(bool enabled)
-{
+ResultCode EqualizerModel::setBandType(int index, FilterType type) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands[index].type = type;
+    emit bandChanged(index);
+    return ResultCode::OK;
+}
+
+ResultCode EqualizerModel::setBandAlgorithm(int index, FilterAlgorithmType algo) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands[index].algo = algo;
+    emit bandChanged(index);
+    return ResultCode::OK;
+}
+
+ResultCode EqualizerModel::setBandBypass(int index, bool bypass) {
+    if (!isValidIndex(index)) return ResultCode::IndexOutOfRange;
+    m_bands[index].bypass = bypass;
+    emit bandChanged(index);
+    return ResultCode::OK;
+}
+
+// ── LPF ─────────────────────────────────────────
+ShelfBand EqualizerModel::lpf() const { return m_lpf; }
+
+ResultCode EqualizerModel::setLpfEnabled(bool enabled) {
     m_lpf.enabled = enabled;
     emit lpfChanged();
     return ResultCode::OK;
 }
 
-ResultCode EqualizerModel::setHpfEnabled(bool enabled)
-{
+ResultCode EqualizerModel::setLpfFrequency(double freqHz) {
+    if (freqHz <= 0.0) return ResultCode::InvalidParameter;
+    m_lpf.freqHz = freqHz;
+    emit lpfChanged();
+    return ResultCode::OK;
+}
+
+ResultCode EqualizerModel::setLpfAlgorithm(FilterAlgorithmType algo) {
+    m_lpf.algo = algo;
+    emit lpfChanged();
+    return ResultCode::OK;
+}
+
+// ── HPF ─────────────────────────────────────────
+ShelfBand EqualizerModel::hpf() const { return m_hpf; }
+
+ResultCode EqualizerModel::setHpfEnabled(bool enabled) {
     m_hpf.enabled = enabled;
     emit hpfChanged();
     return ResultCode::OK;
+}
+
+ResultCode EqualizerModel::setHpfFrequency(double freqHz) {
+    if (freqHz <= 0.0) return ResultCode::InvalidParameter;
+    m_hpf.freqHz = freqHz;
+    emit hpfChanged();
+    return ResultCode::OK;
+}
+
+ResultCode EqualizerModel::setHpfAlgorithm(FilterAlgorithmType algo) {
+    m_hpf.algo = algo;
+    emit hpfChanged();
+    return ResultCode::OK;
+}
+
+// ── Sample Rate ─────────────────────────────────
+SampleRate EqualizerModel::sampleRate() const { return m_sampleRate; }
+
+ResultCode EqualizerModel::setSampleRate(SampleRate rate) {
+    m_sampleRate = rate;
+    emit sampleRateChanged(rate);
+    return ResultCode::OK;
+}
+
+// ── Focus ───────────────────────────────────────
+int EqualizerModel::focusedBandIndex() const { return m_focusedIdx; }
+
+void EqualizerModel::setFocusedBandIndex(int index) {
+    if (m_focusedIdx != index) {
+        m_focusedIdx = index;
+        emit focusedBandChanged(index);
+    }
+}
+
+// ── Gain Range ──────────────────────────────────
+double EqualizerModel::gainMin() const { return m_gainMin; }
+double EqualizerModel::gainMax() const { return m_gainMax; }
+
+ResultCode EqualizerModel::setGainRange(double minDb, double maxDb) {
+    if (minDb >= maxDb) return ResultCode::InvalidParameter;
+    m_gainMin = minDb;
+    m_gainMax = maxDb;
+    emit gainRangeChanged(minDb, maxDb);
+    return ResultCode::OK;
+}
+
+// ── Q Range ─────────────────────────────────────
+ResultCode EqualizerModel::setQRange(FilterType type, double minQ, double maxQ) {
+    if (minQ <= 0.0 || minQ >= maxQ) return ResultCode::InvalidParameter;
+    m_qRanges[type] = {minQ, maxQ};
+    for (int i = 0; i < m_bands.size(); ++i) {
+        if (m_bands[i].type == type) {
+            double clamped = std::clamp(m_bands[i].q, minQ, maxQ);
+            if (m_bands[i].q != clamped) {
+                m_bands[i].q = clamped;
+                emit bandChanged(i);
+            }
+        }
+    }
+    return ResultCode::OK;
+}
+
+double EqualizerModel::qMin(FilterType type) const {
+    return m_qRanges.value(type, {0.1, 10.0}).first;
+}
+
+double EqualizerModel::qMax(FilterType type) const {
+    return m_qRanges.value(type, {0.1, 10.0}).second;
 }

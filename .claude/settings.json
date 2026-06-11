@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C d:/workshop/Github/AudioEQ_Visualized status --short)",
+      "Bash(cmake --build . --config Debug --target SimpleDemo)",
+      "Bash(timeout 8 ./SimpleDemo.exe)",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(QT_DEBUG_PLUGINS=1 QT_LOGGING_RULES=\"*=true\" timeout 5 ./SimpleDemo.exe)",
+      "Bash(where cdb.exe)",
+      "Bash(where windbg.exe)",
+      "Read(//c/Program Files \\(x86\\)/Windows Kits/10/**)",
+      "Bash(ls \"/c/Program Files \\(x86\\)/Windows Kits/10/\" 2>&1; ls \"/c/Program Files/Microsoft Visual Studio/\" 2>&1)",
+      "Read(//c/Program Files/Microsoft Visual Studio//**)",
+      "Bash(./SimpleDemo.exe)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(tasklist)",
+      "Bash(taskkill //F //IM SimpleDemo.exe)",
+      "Bash(rm -f stdout.log stderr.log)"
+    ]
+  }
+}

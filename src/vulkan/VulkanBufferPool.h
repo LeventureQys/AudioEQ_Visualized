@@ -1,40 +1,39 @@
 #pragma once
-#include <volk.h>
-#include <QVector>
-#include <QHash>
+
+#include "volk.h"
+#include <cstddef>
+#include <cstdint>
 
 class VulkanContext;
 
+struct BufferAllocation {
+    VkBuffer        buffer  = VK_NULL_HANDLE;
+    VkDeviceMemory  memory  = VK_NULL_HANDLE;
+    void*           mapped  = nullptr;
+    VkDeviceSize    size    = 0;
+};
+
 class VulkanBufferPool {
 public:
-	VulkanBufferPool();
-	~VulkanBufferPool();
+    explicit VulkanBufferPool(VulkanContext* ctx);
+    ~VulkanBufferPool();
 
-	VulkanBufferPool(const VulkanBufferPool&) = delete;
-	VulkanBufferPool& operator=(const VulkanBufferPool&) = delete;
+    BufferAllocation createVertexBuffer(VkDeviceSize size);
+    BufferAllocation createIndexBuffer(VkDeviceSize size);
+    BufferAllocation createUniformBuffer(VkDeviceSize size);
 
-	bool initialize(VulkanContext* ctx);
-	void cleanup();
-
-	VkBuffer allocateVertexBuffer(VkDeviceSize size, const void* data);
-	VkBuffer allocateIndexBuffer(VkDeviceSize size, const void* data);
-	VkBuffer allocateUniformBuffer(VkDeviceSize size);
-	void updateUniformBuffer(VkBuffer buffer, VkDeviceSize size, const void* data);
-
-	void freeBuffer(VkBuffer buffer);
+    void uploadData(const BufferAllocation& dst, const void* data, VkDeviceSize size);
+    void free(BufferAllocation& alloc);
 
 private:
-	VulkanContext* m_context = nullptr;
-	QVector<VkBuffer> m_buffers;
-	QVector<VkDeviceMemory> m_memories;
+    VulkanContext*  m_ctx;
 
-	struct BufferAllocation {
-		VkBuffer buffer = VK_NULL_HANDLE;
-		VkDeviceMemory memory = VK_NULL_HANDLE;
-	};
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags props);
+    BufferAllocation createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags props);
 
-	BufferAllocation createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-		VkMemoryPropertyFlags properties);
-	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-	void copyDataToBuffer(VkBuffer buffer, VkDeviceSize size, const void* data);
+    // Command pool for staging uploads
+    VkCommandPool    m_commandPool = VK_NULL_HANDLE;
+    void ensureCommandPool();
+    VkCommandBuffer beginOneShot();
+    void endOneShot(VkCommandBuffer cmd);
 };

@@ -1,19 +1,29 @@
 #pragma once
-#include "FilterAlgorithm.h"
 
-class ButterworthIIR : public FilterAlgorithm {
+#include "FilterAlgorithm.h"
+#include "../AudioEQTypes.h"
+
+class AUDIOEQ_EXPORT ButterworthIIR final : public FilterAlgorithm {
 public:
-    FilterAlgorithmType type() const override { return FilterAlgorithmType::ButterworthIIR; }
-    double evaluateAt(double freqHz, double sampleRate, const EQBand& band) const override;
-    QPair<double,double> qRange(FilterType filterType) const override;
+    ButterworthIIR(FilterType type, double freqHz, double gainDb, double q);
+
+    double evaluateAt(double freqHz, double sampleRate) const override;
 
 private:
-    struct BiquadCoeff { double b0, b1, b2, a1, a2; };
+    FilterType m_type;
+    double     m_freqHz;
+    double     m_gainDb;
+    double     m_q;
 
-    BiquadCoeff makePeakFilter(double freq, double q, double gain, double sampleRate) const;
-    BiquadCoeff makeLowShelf(double freq, double q, double gain, double sampleRate) const;
-    BiquadCoeff makeHighShelf(double freq, double q, double gain, double sampleRate) const;
-    BiquadCoeff makeLowPass(double freq, double sampleRate) const;
-    BiquadCoeff makeHighPass(double freq, double sampleRate) const;
-    double freqResponseGain(const BiquadCoeff& coeff, double freq, double sampleRate) const;
+    struct Coeffs { double b0, b1, b2, a1, a2; };
+
+    Coeffs computeCoeffs(double sampleRate) const;
+
+    static Coeffs makePeakFilter(double freq, double q, double gain, double sr);
+    static Coeffs makeLowShelf(double freq, double q, double gain, double sr);
+    static Coeffs makeHighShelf(double freq, double q, double gain, double sr);
+    static Coeffs makeLowPass(double freq, double sr);
+    static Coeffs makeHighPass(double freq, double sr);
+
+    static double freqResponseDb(const Coeffs& c, double freqHz, double sampleRate);
 };

@@ -1,62 +1,47 @@
 #pragma once
-#include <volk.h>
+
+#include "volk.h"
 #include <QSize>
-#include <QVector>
+#include <vector>
 
 class VulkanContext;
 
 class VulkanSwapchain {
 public:
-	VulkanSwapchain();
-	~VulkanSwapchain();
+    explicit VulkanSwapchain(VulkanContext* ctx);
+    ~VulkanSwapchain();
 
-	VulkanSwapchain(const VulkanSwapchain&) = delete;
-	VulkanSwapchain& operator=(const VulkanSwapchain&) = delete;
+    bool create(VkSurfaceKHR surface, QSize size);
+    void destroy();
+    bool resize(QSize newSize);
 
-	bool initialize(VulkanContext* ctx, VkSurfaceKHR surface, QSize size, float devicePixelRatio = 1.0f);
-	void cleanup();
+    bool acquireNextImage(VkSemaphore imageAvailable, uint32_t* outImageIndex);
+    bool present(VkQueue queue, uint32_t imageIndex, VkSemaphore renderFinished);
 
-	VkSwapchainKHR swapchain() const;
-	VkFormat format() const;
-	VkExtent2D extent() const;
-	VkRenderPass renderPass() const;
-	uint32_t imageCount() const;
-	VkImageView imageView(uint32_t index) const;
-	VkFramebuffer framebuffer(uint32_t index) const;
-	VkSampleCountFlagBits msaaSamples() const;
-
-	bool recreate(QSize newSize, float devicePixelRatio = 1.0f);
-
-	void setRenderPassForTest(VkRenderPass rp) { m_renderPass = rp; }
-	void setExtentForTest(VkExtent2D ext) { m_extent = ext; }
-	void setMsaaSamplesForTest(VkSampleCountFlagBits s) { m_msaaSamples = s; }
+    VkFormat          format()         const;
+    VkExtent2D        extent()         const;
+    uint32_t          imageCount()     const;
+    VkImageView       imageView(int i) const;
+    VkRenderPass      renderPass()     const;
+    VkFramebuffer     framebuffer(int i) const;
 
 private:
-	VulkanContext* m_context = nullptr;
-	VkSwapchainKHR m_swapchain = VK_NULL_HANDLE;
-	VkRenderPass m_renderPass = VK_NULL_HANDLE;
-	VkFormat m_format = VK_FORMAT_B8G8R8A8_UNORM;
+    void createRenderPass();
+    void createFramebuffers();
+    void createMSAA();
+    VkSurfaceFormatKHR chooseSurfaceFormat(VkPhysicalDevice pd, VkSurfaceKHR surface);
 
-	QVector<VkImage> m_images;
-	QVector<VkImageView> m_imageViews;
-	QVector<VkFramebuffer> m_framebuffers;
+    VulkanContext*          m_ctx;
+    VkSurfaceKHR            m_surface       = VK_NULL_HANDLE;
+    VkSwapchainKHR          m_swapchain     = VK_NULL_HANDLE;
+    VkRenderPass            m_renderPass    = VK_NULL_HANDLE;
+    std::vector<VkImage>    m_images;
+    std::vector<VkImageView> m_imageViews;
+    std::vector<VkFramebuffer> m_framebuffers;
+    VkFormat                m_format        = VK_FORMAT_UNDEFINED;
+    VkExtent2D              m_extent        = {0, 0};
 
-	VkImage m_msaaImage = VK_NULL_HANDLE;
-	VkDeviceMemory m_msaaMemory = VK_NULL_HANDLE;
-	VkImageView m_msaaImageView = VK_NULL_HANDLE;
-	VkSampleCountFlagBits m_msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-
-	VkExtent2D m_extent{};
-	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
-	float m_devicePixelRatio = 1.0f;
-
-	bool createSwapchain(QSize size);
-	void createImageViews();
-	bool createMSAA();
-	bool createRenderPass();
-	void createFramebuffers();
-	void cleanupSwapchainResources();
-	VkSurfaceFormatKHR chooseSurfaceFormat(const QVector<VkSurfaceFormatKHR>& formats);
-	VkPresentModeKHR choosePresentMode(const QVector<VkPresentModeKHR>& modes);
-	VkExtent2D chooseExtent(const VkSurfaceCapabilitiesKHR& capabilities, QSize size);
+    VkImage                 m_msaaImage     = VK_NULL_HANDLE;
+    VkDeviceMemory          m_msaaMemory    = VK_NULL_HANDLE;
+    VkImageView             m_msaaView      = VK_NULL_HANDLE;
 };

@@ -1,69 +1,124 @@
 #pragma once
-#include <volk.h>
+
 #include <QObject>
-#include <QColor>
 #include <QVector>
+#include <QPointF>
+#include <QColor>
+#include <QMap>
+#include "volk.h"
+#include "VulkanContext.h"
+#include "VulkanSwapchain.h"
+#include "VulkanFrameSync.h"
+#include "VulkanPipeline.h"
+#include "VulkanBufferPool.h"
+#include "VulkanFontAtlas.h"
+#include "../AudioEQTypes.h"
 
-class VulkanContext;
-class VulkanSwapchain;
-class VulkanPipeline;
-class VulkanBufferPool;
-class VulkanFontAtlas;
-class VulkanFrameSync;
+class CoordinateMapper;
 
-class VulkanRenderer : public QObject {
-	Q_OBJECT
+#ifndef AUDIOEQ_EXPORT
+  #ifdef _WIN32
+    #define AUDIOEQ_EXPORT __declspec(dllimport)
+  #else
+    #define AUDIOEQ_EXPORT
+  #endif
+#endif
+
+struct BandRenderData {
+    double  freqHz  = 1000.0;
+    double  gainDb  = 0.0;
+    int     index   = 0;
+    bool    focused = false;
+    bool    bypass  = false;
+};
+
+struct LpfRenderData { double freqHz = 20000.0; bool enabled = false; };
+struct HpfRenderData { double freqHz = 20.0;    bool enabled = false; };
+
+class AUDIOEQ_EXPORT VulkanRenderer : public QObject {
+    Q_OBJECT
 public:
-	VulkanRenderer();
-	~VulkanRenderer();
-	VulkanRenderer(const VulkanRenderer&) = delete;
-	VulkanRenderer& operator=(const VulkanRenderer&) = delete;
+    explicit VulkanRenderer(VulkanContext* ctx, QObject* parent = nullptr);
+    ~VulkanRenderer() override;
 
-	bool initialize(VulkanContext* ctx, VulkanSwapchain* swapchain,
-					VulkanPipeline* pipeline, VulkanBufferPool* bufferPool,
-					VulkanFontAtlas* fontAtlas, VulkanFrameSync* frameSync);
-	void cleanup();
+    bool initialize(VkSurfaceKHR surface, QSize size);
+    void destroy();
+    void resize(QSize newSize);
 
-	void updateGridVertices(const QVector<float>& vertices);
-	void updateCurveVertices(const QVector<float>& vertices);
-	void updateFillVertices(const QVector<float>& vertices);
-	void updateGlyphVertices(const QVector<float>& vertices);
+    void setTotalCurve(const QVector<QPointF>& points);
+    void setBandCurve(int index, const QVector<QPointF>& points);
+    void clearBandCurve(int index);
+    void setBands(const QVector<BandRenderData>& bands);
+    void setLpf(const LpfRenderData& lpf);
+    void setHpf(const HpfRenderData& hpf);
+    void setCoordinateMapper(const CoordinateMapper* mapper);
 
-	void setCurveColor(const QColor& color);
-	void setBackgroundColor(const QColor& color);
+    void setCurveColor(QColor color);
+    void setBackgroundColor(QColor color);
 
-	VkCommandBuffer beginFrame(uint32_t* outImageIndex);
-	void endFrame(uint32_t imageIndex, VkQueue presentQueue);
+    void renderFrame();
 
 private:
-	VulkanContext* m_context = nullptr;
-	VulkanSwapchain* m_swapchain = nullptr;
-	VulkanPipeline* m_pipeline = nullptr;
-	VulkanBufferPool* m_bufferPool = nullptr;
-	VulkanFontAtlas* m_fontAtlas = nullptr;
-	VulkanFrameSync* m_frameSync = nullptr;
+    struct UBOData {
+        float projMatrix[16];
+    };
 
-	VkCommandPool m_commandPool = VK_NULL_HANDLE;
-	QVector<VkCommandBuffer> m_commandBuffers;
+    QVector<float> buildCurveVBO(const QVector<QPointF>& points, float lineWidthPx);
+    QVector<float> buildGridVBO(int* outVertexCount);
+    QVector<float> buildGlyphVBO(float x, float y, const QString& text);
+    QVector<float> buildCircleVBO(float cx, float cy, float radius, int segments);
+    QVector<float> buildEllipseVBO(float cx, float cy, float rx, float ry, int segments);
+    QVector<float> buildFillVBO(const QVector<QPointF>& curvePoints);
+    void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex);
+    float toNdcX(float pixelX) const;
+    float toNdcY(float pixelY) const;
+    bool createDescriptorPool();
+    bool allocateDescriptorSets();
+    void updateUBO(int frameIdx, const QColor& color);
+    void ensureTotalCurveVBO(size_t floatCount);
+    void ensureBandCurveVBO(int index, size_t floatCount);
 
-	struct VboResource {
-		VkBuffer buffer = VK_NULL_HANDLE;
-		VkDeviceMemory memory = VK_NULL_HANDLE;
-		VkDeviceSize size = 0;
-	};
-	VboResource m_gridVbo, m_curveVbo, m_fillVbo, m_glyphVbo;
+    VulkanContext*    m_ctx;
+    VulkanSwapchain   m_swapchain;
+    VulkanFrameSync   m_frameSync;
+    VulkanPipeline    m_pipeline;
+    VulkanBufferPool  m_bufferPool;
+    VulkanFontAtlas   m_fontAtlas;
 
-	QColor m_curveColor{0, 255, 0};
-	QColor m_backgroundColor{26, 26, 26};
+    QVector<QPointF>              m_totalCurve;
+    QMap<int, QVector<QPointF>>   m_bandCurves;
+    QVector<BandRenderData>       m_bands;
+    LpfRenderData                 m_lpf;
+    HpfRenderData                 m_hpf;
+    const CoordinateMapper*       m_mapper = nullptr;
 
-	bool createCommandPool();
-	void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex);
-	void ensureVBO(VboResource& vbo, const QVector<float>& vertices,
-				   VkBufferUsageFlags usage);
-	void destroyVboResource(VboResource& vbo);
-	void createVboResource(VboResource& vbo, VkDeviceSize size,
-						   const void* data, VkBufferUsageFlags usage);
-	static uint32_t findMemoryType(VkPhysicalDevice physicalDevice,
-								   uint32_t typeFilter,
-								   VkMemoryPropertyFlags properties);
+    BufferAllocation m_gridVBO;
+    int              m_gridVertexCount = 0;
+    BufferAllocation m_totalCurveVBO;
+    QMap<int, BufferAllocation> m_bandCurveVBOs;
+
+    BufferAllocation m_gridUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
+    BufferAllocation m_curveUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
+    BufferAllocation m_fillUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
+    BufferAllocation m_glyphUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
+
+    VkDescriptorPool  m_descriptorPool = VK_NULL_HANDLE;
+    VkDescriptorSet   m_glyphDescSet[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT] = {};
+    VkDescriptorSet   m_gridDescSet[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT]  = {};
+    VkDescriptorSet   m_curveDescSet[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT] = {};
+    VkDescriptorSet   m_fillDescSet[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT]  = {};
+
+    VkCommandPool     m_commandPool = VK_NULL_HANDLE;
+    VkCommandBuffer   m_commandBuffers[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT] = {};
+
+    QColor m_curveColor      = QColor(0, 255, 0);
+    QColor m_backgroundColor = QColor(26, 26, 26);
+    QColor m_gridColor       = QColor(255, 255, 255, 38);
+    QColor m_gridZeroColor   = QColor(255, 255, 255, 64);
+
+    VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+    QSize        m_size;
+    bool         m_initialized = false;
+    bool         m_gridDirty   = true;
+    bool         m_curveDirty  = true;
 };

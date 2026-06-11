@@ -1,443 +1,243 @@
-#include "vulkan/VulkanPipeline.h"
-#include "vulkan/VulkanContext.h"
-#include "vulkan/VulkanSwapchain.h"
-#include "vulkan/EmbeddedShaders.h"
+#include "VulkanPipeline.h"
+#include "VulkanContext.h"
+#include "EmbeddedShaders.h"
+#include <QDebug>
+#include <vector>
 
-VulkanPipeline::VulkanPipeline() = default;
+VulkanPipeline::VulkanPipeline(VulkanContext* ctx) : m_ctx(ctx) {}
+VulkanPipeline::~VulkanPipeline() { destroy(); }
 
-VulkanPipeline::~VulkanPipeline()
-{
-	cleanup();
+VkShaderModule VulkanPipeline::loadShaderModule(const uint32_t* spvData, size_t spvSize) {
+    VkShaderModuleCreateInfo ci = {};
+    ci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    ci.codeSize = spvSize * sizeof(uint32_t);
+    ci.pCode = spvData;
+    VkShaderModule mod = VK_NULL_HANDLE;
+    VkResult r = vkCreateShaderModule(m_ctx->device(), &ci, nullptr, &mod);
+    if (r != VK_SUCCESS) {
+        qWarning() << "VulkanPipeline: vkCreateShaderModule failed:" << r;
+        return VK_NULL_HANDLE;
+    }
+    return mod;
 }
 
-bool VulkanPipeline::initialize(VulkanContext* ctx, VulkanSwapchain* swapchain)
-{
-	if (!ctx || !swapchain) return false;
-	if (swapchain->renderPass() == VK_NULL_HANDLE) return false;
+VkDescriptorSetLayout VulkanPipeline::createDescriptorSetLayout(PipelineType type) {
+    std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-	m_context = ctx;
-	m_swapchain = swapchain;
+    if (type == PipelineType::Glyph) {
+        VkDescriptorSetLayoutBinding ubo = {};
+        ubo.binding = 0;
+        ubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        ubo.descriptorCount = 1;
+        ubo.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        bindings.push_back(ubo);
 
-	m_pipelines[PipelineType::Grid] = createGridPipeline();
-	m_pipelines[PipelineType::Curve] = createCurvePipeline();
-	m_pipelines[PipelineType::Fill] = createFillPipeline();
-	m_pipelines[PipelineType::Glyph] = createGlyphPipeline();
+        VkDescriptorSetLayoutBinding sampler = {};
+        sampler.binding = 1;
+        sampler.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler.descriptorCount = 1;
+        sampler.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        bindings.push_back(sampler);
+    } else {
+        VkDescriptorSetLayoutBinding ubo = {};
+        ubo.binding = 0;
+        ubo.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        ubo.descriptorCount = 1;
+        ubo.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        bindings.push_back(ubo);
+    }
 
-	for (const auto& pd : m_pipelines) {
-		if (pd.pipeline == VK_NULL_HANDLE) return false;
-	}
+    VkDescriptorSetLayoutCreateInfo ci = {};
+    ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    ci.bindingCount = static_cast<uint32_t>(bindings.size());
+    ci.pBindings = bindings.data();
 
-	return true;
+    VkDescriptorSetLayout layout;
+    vkCreateDescriptorSetLayout(m_ctx->device(), &ci, nullptr, &layout);
+    return layout;
 }
 
-void VulkanPipeline::cleanup()
-{
-	if (!m_context) return;
-	auto device = m_context->device();
-
-	for (auto& pd : m_pipelines) {
-		if (pd.pipeline != VK_NULL_HANDLE) {
-			vkDestroyPipeline(device, pd.pipeline, nullptr);
-			pd.pipeline = VK_NULL_HANDLE;
-		}
-		if (pd.layout != VK_NULL_HANDLE) {
-			vkDestroyPipelineLayout(device, pd.layout, nullptr);
-			pd.layout = VK_NULL_HANDLE;
-		}
-		if (pd.descriptorSetLayout != VK_NULL_HANDLE) {
-			vkDestroyDescriptorSetLayout(device, pd.descriptorSetLayout, nullptr);
-			pd.descriptorSetLayout = VK_NULL_HANDLE;
-		}
-	}
-
-	m_pipelines.clear();
-	m_context = nullptr;
-	m_swapchain = nullptr;
+bool VulkanPipeline::create(VkRenderPass renderPass) {
+    return createPipeline(PipelineType::Grid, renderPass)
+        && createPipeline(PipelineType::Curve, renderPass)
+        && createPipeline(PipelineType::Fill, renderPass)
+        && createPipeline(PipelineType::Glyph, renderPass);
 }
 
-VkPipeline VulkanPipeline::pipeline(PipelineType type) const
-{
-	return m_pipelines.value(type).pipeline;
+bool VulkanPipeline::createPipeline(PipelineType type, VkRenderPass renderPass) {
+    auto& ps = m_pipelines[static_cast<int>(type)];
+
+    const uint32_t* vertData = nullptr;
+    const uint32_t* fragData = nullptr;
+    size_t vertSize = 0, fragSize = 0;
+
+    using namespace EmbeddedShaders;
+    switch (type) {
+        case PipelineType::Grid:
+            vertData = GRID_VERT; vertSize = GRID_VERT_size;
+            fragData = GRID_FRAG; fragSize = GRID_FRAG_size;
+            break;
+        case PipelineType::Curve:
+            vertData = CURVE_VERT; vertSize = CURVE_VERT_size;
+            fragData = CURVE_FRAG; fragSize = CURVE_FRAG_size;
+            break;
+        case PipelineType::Fill:
+            vertData = FILL_VERT; vertSize = FILL_VERT_size;
+            fragData = FILL_FRAG; fragSize = FILL_FRAG_size;
+            break;
+        case PipelineType::Glyph:
+            vertData = GLYPH_VERT; vertSize = GLYPH_VERT_size;
+            fragData = GLYPH_FRAG; fragSize = GLYPH_FRAG_size;
+            break;
+    }
+
+    if (!vertData || !fragData) {
+        qWarning() << "VulkanPipeline: Missing SPIR-V data for pipeline" << static_cast<int>(type);
+        return false;
+    }
+
+    ps.vertModule = loadShaderModule(vertData, vertSize);
+    ps.fragModule = loadShaderModule(fragData, fragSize);
+
+    VkPipelineShaderStageCreateInfo stages[2] = {};
+    stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    stages[0].module = ps.vertModule;
+    stages[0].pName = "main";
+    stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    stages[1].module = ps.fragModule;
+    stages[1].pName = "main";
+
+    std::vector<VkVertexInputBindingDescription> bindings;
+    std::vector<VkVertexInputAttributeDescription> attrs;
+
+    VkVertexInputBindingDescription vbind = {};
+    vbind.binding = 0;
+    vbind.stride = 0;
+    vbind.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    if (type == PipelineType::Grid) {
+        vbind.stride = 2 * sizeof(float);
+        bindings.push_back(vbind);
+        attrs.push_back({0, 0, VK_FORMAT_R32G32_SFLOAT, 0});
+    } else if (type == PipelineType::Curve) {
+        vbind.stride = 3 * sizeof(float);
+        bindings.push_back(vbind);
+        attrs.push_back({0, 0, VK_FORMAT_R32G32_SFLOAT, 0});
+        attrs.push_back({1, 0, VK_FORMAT_R32_SFLOAT, 2 * sizeof(float)});
+    } else if (type == PipelineType::Fill) {
+        vbind.stride = 3 * sizeof(float);
+        bindings.push_back(vbind);
+        attrs.push_back({0, 0, VK_FORMAT_R32G32_SFLOAT, 0});
+        attrs.push_back({1, 0, VK_FORMAT_R32_SFLOAT, 2 * sizeof(float)});
+    } else if (type == PipelineType::Glyph) {
+        vbind.stride = 4 * sizeof(float);
+        bindings.push_back(vbind);
+        attrs.push_back({0, 0, VK_FORMAT_R32G32_SFLOAT, 0});
+        attrs.push_back({1, 0, VK_FORMAT_R32G32_SFLOAT, 2 * sizeof(float)});
+    }
+
+    VkPipelineVertexInputStateCreateInfo vi = {};
+    vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vi.vertexBindingDescriptionCount = static_cast<uint32_t>(bindings.size());
+    vi.pVertexBindingDescriptions = bindings.data();
+    vi.vertexAttributeDescriptionCount = static_cast<uint32_t>(attrs.size());
+    vi.pVertexAttributeDescriptions = attrs.data();
+
+    VkPipelineInputAssemblyStateCreateInfo ia = {};
+    ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    ia.topology = (type == PipelineType::Grid) ? VK_PRIMITIVE_TOPOLOGY_LINE_LIST : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+
+    VkViewport vp = {0, 0, (float)1000, (float)800, 0, 1};
+    VkRect2D scissor = {{0,0}, {1000,800}};
+    VkPipelineViewportStateCreateInfo vps = {};
+    vps.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    vps.viewportCount = 1;
+    vps.pViewports = &vp;
+    vps.scissorCount = 1;
+    vps.pScissors = &scissor;
+
+    VkPipelineRasterizationStateCreateInfo rs = {};
+    rs.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rs.polygonMode = VK_POLYGON_MODE_FILL;
+    rs.cullMode = VK_CULL_MODE_NONE;
+    rs.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rs.lineWidth = 1.0f;
+
+    VkPipelineMultisampleStateCreateInfo ms = {};
+    ms.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    ms.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+
+    VkPipelineColorBlendAttachmentState cba = {};
+    cba.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    cba.blendEnable = VK_TRUE;
+    cba.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    cba.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    cba.colorBlendOp = VK_BLEND_OP_ADD;
+    cba.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    cba.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    cba.alphaBlendOp = VK_BLEND_OP_ADD;
+
+    VkPipelineColorBlendStateCreateInfo cb = {};
+    cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    cb.attachmentCount = 1;
+    cb.pAttachments = &cba;
+
+    std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+    if (type == PipelineType::Curve) {
+        dynamicStates.push_back(VK_DYNAMIC_STATE_LINE_WIDTH);
+    }
+    VkPipelineDynamicStateCreateInfo ds = {};
+    ds.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    ds.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+    ds.pDynamicStates = dynamicStates.data();
+
+    ps.descriptorSetLayout = createDescriptorSetLayout(type);
+
+    VkPipelineLayoutCreateInfo pl = {};
+    pl.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pl.setLayoutCount = 1;
+    pl.pSetLayouts = &ps.descriptorSetLayout;
+    vkCreatePipelineLayout(m_ctx->device(), &pl, nullptr, &ps.layout);
+
+    VkGraphicsPipelineCreateInfo pci = {};
+    pci.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pci.stageCount = 2;
+    pci.pStages = stages;
+    pci.pVertexInputState = &vi;
+    pci.pInputAssemblyState = &ia;
+    pci.pViewportState = &vps;
+    pci.pRasterizationState = &rs;
+    pci.pMultisampleState = &ms;
+    pci.pColorBlendState = &cb;
+    pci.pDynamicState = &ds;
+    pci.layout = ps.layout;
+    pci.renderPass = renderPass;
+    pci.subpass = 0;
+
+    if (vkCreateGraphicsPipelines(m_ctx->device(), VK_NULL_HANDLE, 1, &pci, nullptr, &ps.pipeline) != VK_SUCCESS) {
+        qWarning() << "VulkanPipeline: Failed to create pipeline" << static_cast<int>(type);
+        return false;
+    }
+
+    qDebug() << "VulkanPipeline: Created pipeline" << static_cast<int>(type);
+    return true;
 }
 
-VkPipelineLayout VulkanPipeline::pipelineLayout(PipelineType type) const
-{
-	return m_pipelines.value(type).layout;
+void VulkanPipeline::destroy() {
+    VkDevice dev = m_ctx ? m_ctx->device() : VK_NULL_HANDLE;
+    if (!dev) return;
+    for (auto& ps : m_pipelines) {
+        if (ps.pipeline) vkDestroyPipeline(dev, ps.pipeline, nullptr);
+        if (ps.layout) vkDestroyPipelineLayout(dev, ps.layout, nullptr);
+        if (ps.descriptorSetLayout) vkDestroyDescriptorSetLayout(dev, ps.descriptorSetLayout, nullptr);
+        if (ps.vertModule) vkDestroyShaderModule(dev, ps.vertModule, nullptr);
+        if (ps.fragModule) vkDestroyShaderModule(dev, ps.fragModule, nullptr);
+        ps = {};
+    }
 }
 
-VkDescriptorSetLayout VulkanPipeline::descriptorSetLayout(PipelineType type) const
-{
-	return m_pipelines.value(type).descriptorSetLayout;
-}
-
-VkShaderModule VulkanPipeline::createShaderModule(const uint32_t* code, size_t size)
-{
-	if (!code || size == 0) return VK_NULL_HANDLE;
-
-	VkShaderModuleCreateInfo createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.codeSize = size;
-	createInfo.pCode = code;
-
-	VkShaderModule module;
-	if (vkCreateShaderModule(m_context->device(), &createInfo, nullptr, &module) != VK_SUCCESS) {
-		return VK_NULL_HANDLE;
-	}
-
-	return module;
-}
-
-VkDescriptorSetLayout VulkanPipeline::createDescriptorSetLayout(
-	const QVector<VkDescriptorSetLayoutBinding>& bindings)
-{
-	VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-	layoutInfo.pBindings = bindings.data();
-
-	VkDescriptorSetLayout layout;
-	if (vkCreateDescriptorSetLayout(m_context->device(), &layoutInfo, nullptr, &layout) != VK_SUCCESS) {
-		return VK_NULL_HANDLE;
-	}
-
-	return layout;
-}
-
-VulkanPipeline::PipelineData VulkanPipeline::createGraphicsPipeline(
-	VkShaderModule vert, VkShaderModule frag,
-	VkDescriptorSetLayout dsl,
-	VkPrimitiveTopology topology,
-	VkPolygonMode polygonMode,
-	float lineWidth,
-	bool enableBlend,
-	const QVector<VkVertexInputBindingDescription>& vertexBindings,
-	const QVector<VkVertexInputAttributeDescription>& vertexAttrs)
-{
-	PipelineData result;
-	auto device = m_context->device();
-
-	VkPipelineShaderStageCreateInfo vertStage{};
-	vertStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vertStage.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertStage.module = vert;
-	vertStage.pName = "main";
-
-	VkPipelineShaderStageCreateInfo fragStage{};
-	fragStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	fragStage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragStage.module = frag;
-	fragStage.pName = "main";
-
-	VkPipelineShaderStageCreateInfo shaderStages[] = {vertStage, fragStage};
-
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindings.size());
-	vertexInputInfo.pVertexBindingDescriptions = vertexBindings.data();
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttrs.size());
-	vertexInputInfo.pVertexAttributeDescriptions = vertexAttrs.data();
-
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inputAssembly.topology = topology;
-	inputAssembly.primitiveRestartEnable = VK_FALSE;
-
-	VkViewport viewport{};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(m_swapchain->extent().width);
-	viewport.height = static_cast<float>(m_swapchain->extent().height);
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-
-	VkRect2D scissor{};
-	scissor.offset = {0, 0};
-	scissor.extent = m_swapchain->extent();
-
-	VkPipelineViewportStateCreateInfo viewportState{};
-	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	viewportState.viewportCount = 1;
-	viewportState.pViewports = &viewport;
-	viewportState.scissorCount = 1;
-	viewportState.pScissors = &scissor;
-
-	VkPipelineRasterizationStateCreateInfo rasterizer{};
-	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-	rasterizer.depthClampEnable = VK_FALSE;
-	rasterizer.rasterizerDiscardEnable = VK_FALSE;
-	rasterizer.polygonMode = polygonMode;
-	rasterizer.cullMode = VK_CULL_MODE_NONE;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-	rasterizer.depthBiasEnable = VK_FALSE;
-	rasterizer.lineWidth = lineWidth;
-
-	VkPipelineMultisampleStateCreateInfo multisampling{};
-	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	multisampling.rasterizationSamples = m_swapchain->msaaSamples();
-	multisampling.sampleShadingEnable = VK_FALSE;
-
-	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-	colorBlendAttachment.blendEnable = enableBlend ? VK_TRUE : VK_FALSE;
-	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
-	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
-		VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-
-	VkPipelineColorBlendStateCreateInfo colorBlending{};
-	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	colorBlending.logicOpEnable = VK_FALSE;
-	colorBlending.attachmentCount = 1;
-	colorBlending.pAttachments = &colorBlendAttachment;
-
-	VkDynamicState dynamicStates[] = {
-		VK_DYNAMIC_STATE_VIEWPORT,
-		VK_DYNAMIC_STATE_SCISSOR,
-	};
-
-	VkPipelineDynamicStateCreateInfo dynamicState{};
-	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicState.dynamicStateCount = 2;
-	dynamicState.pDynamicStates = dynamicStates;
-
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &dsl;
-
-	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &result.layout) != VK_SUCCESS) {
-		return PipelineData{};
-	}
-
-	VkGraphicsPipelineCreateInfo pipelineInfo{};
-	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	pipelineInfo.stageCount = 2;
-	pipelineInfo.pStages = shaderStages;
-	pipelineInfo.pVertexInputState = &vertexInputInfo;
-	pipelineInfo.pInputAssemblyState = &inputAssembly;
-	pipelineInfo.pViewportState = &viewportState;
-	pipelineInfo.pRasterizationState = &rasterizer;
-	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.pDynamicState = &dynamicState;
-	pipelineInfo.layout = result.layout;
-	pipelineInfo.renderPass = m_swapchain->renderPass();
-	pipelineInfo.subpass = 0;
-
-	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &result.pipeline) != VK_SUCCESS) {
-		vkDestroyPipelineLayout(device, result.layout, nullptr);
-		result.layout = VK_NULL_HANDLE;
-		return PipelineData{};
-	}
-
-	result.descriptorSetLayout = dsl;
-	return result;
-}
-
-VulkanPipeline::PipelineData VulkanPipeline::createGridPipeline()
-{
-	VkShaderModule vert = createShaderModule(grid_vert_spv, grid_vert_spv_size);
-	VkShaderModule frag = createShaderModule(grid_frag_spv, grid_frag_spv_size);
-	if (vert == VK_NULL_HANDLE || frag == VK_NULL_HANDLE) {
-		if (vert != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		if (frag != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkDescriptorSetLayoutBinding> bindings = {
-		{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr},
-		{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-	};
-
-	VkDescriptorSetLayout dsl = createDescriptorSetLayout(bindings);
-	if (dsl == VK_NULL_HANDLE) {
-		vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkVertexInputBindingDescription> vertexBindings = {
-		{0, 5 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX},
-	};
-
-	QVector<VkVertexInputAttributeDescription> vertexAttrs = {
-		{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
-		{1, 0, VK_FORMAT_R32G32B32_SFLOAT, 2 * sizeof(float)},
-	};
-
-	PipelineData result = createGraphicsPipeline(
-		vert, frag, dsl,
-		VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
-		VK_POLYGON_MODE_FILL,
-		1.0f,
-		true,
-		vertexBindings, vertexAttrs
-	);
-
-	vkDestroyShaderModule(m_context->device(), vert, nullptr);
-	vkDestroyShaderModule(m_context->device(), frag, nullptr);
-
-	if (result.pipeline == VK_NULL_HANDLE) {
-		vkDestroyDescriptorSetLayout(m_context->device(), dsl, nullptr);
-		return PipelineData{};
-	}
-
-	return result;
-}
-
-VulkanPipeline::PipelineData VulkanPipeline::createCurvePipeline()
-{
-	VkShaderModule vert = createShaderModule(curve_vert_spv, curve_vert_spv_size);
-	VkShaderModule frag = createShaderModule(curve_frag_spv, curve_frag_spv_size);
-	if (vert == VK_NULL_HANDLE || frag == VK_NULL_HANDLE) {
-		if (vert != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		if (frag != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkDescriptorSetLayoutBinding> bindings = {
-		{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr},
-		{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-		{2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-	};
-
-	VkDescriptorSetLayout dsl = createDescriptorSetLayout(bindings);
-	if (dsl == VK_NULL_HANDLE) {
-		vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkVertexInputBindingDescription> vertexBindings = {
-		{0, 3 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX},
-	};
-
-	QVector<VkVertexInputAttributeDescription> vertexAttrs = {
-		{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
-		{1, 0, VK_FORMAT_R32_SFLOAT, 2 * sizeof(float)},
-	};
-
-	PipelineData result = createGraphicsPipeline(
-		vert, frag, dsl,
-		VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-		VK_POLYGON_MODE_FILL,
-		2.0f,
-		true,
-		vertexBindings, vertexAttrs
-	);
-
-	vkDestroyShaderModule(m_context->device(), vert, nullptr);
-	vkDestroyShaderModule(m_context->device(), frag, nullptr);
-
-	if (result.pipeline == VK_NULL_HANDLE) {
-		vkDestroyDescriptorSetLayout(m_context->device(), dsl, nullptr);
-		return PipelineData{};
-	}
-
-	return result;
-}
-
-VulkanPipeline::PipelineData VulkanPipeline::createFillPipeline()
-{
-	VkShaderModule vert = createShaderModule(fill_vert_spv, fill_vert_spv_size);
-	VkShaderModule frag = createShaderModule(fill_frag_spv, fill_frag_spv_size);
-	if (vert == VK_NULL_HANDLE || frag == VK_NULL_HANDLE) {
-		if (vert != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		if (frag != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkDescriptorSetLayoutBinding> bindings = {
-		{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr},
-		{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-	};
-
-	VkDescriptorSetLayout dsl = createDescriptorSetLayout(bindings);
-	if (dsl == VK_NULL_HANDLE) {
-		vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkVertexInputBindingDescription> vertexBindings = {
-		{0, 2 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX},
-	};
-
-	QVector<VkVertexInputAttributeDescription> vertexAttrs = {
-		{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
-	};
-
-	PipelineData result = createGraphicsPipeline(
-		vert, frag, dsl,
-		VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-		VK_POLYGON_MODE_FILL,
-		1.0f,
-		false,
-		vertexBindings, vertexAttrs
-	);
-
-	vkDestroyShaderModule(m_context->device(), vert, nullptr);
-	vkDestroyShaderModule(m_context->device(), frag, nullptr);
-
-	if (result.pipeline == VK_NULL_HANDLE) {
-		vkDestroyDescriptorSetLayout(m_context->device(), dsl, nullptr);
-		return PipelineData{};
-	}
-
-	return result;
-}
-
-VulkanPipeline::PipelineData VulkanPipeline::createGlyphPipeline()
-{
-	VkShaderModule vert = createShaderModule(glyph_vert_spv, glyph_vert_spv_size);
-	VkShaderModule frag = createShaderModule(glyph_frag_spv, glyph_frag_spv_size);
-	if (vert == VK_NULL_HANDLE || frag == VK_NULL_HANDLE) {
-		if (vert != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		if (frag != VK_NULL_HANDLE) vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkDescriptorSetLayoutBinding> bindings = {
-		{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr},
-		{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-		{2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-	};
-
-	VkDescriptorSetLayout dsl = createDescriptorSetLayout(bindings);
-	if (dsl == VK_NULL_HANDLE) {
-		vkDestroyShaderModule(m_context->device(), vert, nullptr);
-		vkDestroyShaderModule(m_context->device(), frag, nullptr);
-		return PipelineData{};
-	}
-
-	QVector<VkVertexInputBindingDescription> vertexBindings = {
-		{0, 4 * sizeof(float), VK_VERTEX_INPUT_RATE_VERTEX},
-	};
-
-	QVector<VkVertexInputAttributeDescription> vertexAttrs = {
-		{0, 0, VK_FORMAT_R32G32_SFLOAT, 0},
-		{1, 0, VK_FORMAT_R32G32_SFLOAT, 2 * sizeof(float)},
-	};
-
-	PipelineData result = createGraphicsPipeline(
-		vert, frag, dsl,
-		VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-		VK_POLYGON_MODE_FILL,
-		1.0f,
-		true,
-		vertexBindings, vertexAttrs
-	);
-
-	vkDestroyShaderModule(m_context->device(), vert, nullptr);
-	vkDestroyShaderModule(m_context->device(), frag, nullptr);
-
-	if (result.pipeline == VK_NULL_HANDLE) {
-		vkDestroyDescriptorSetLayout(m_context->device(), dsl, nullptr);
-		return PipelineData{};
-	}
-
-	return result;
-}
+VkPipeline           VulkanPipeline::pipeline(PipelineType t) const { return m_pipelines[static_cast<int>(t)].pipeline; }
+VkPipelineLayout     VulkanPipeline::layout(PipelineType t)   const { return m_pipelines[static_cast<int>(t)].layout; }
+VkDescriptorSetLayout VulkanPipeline::descriptorSetLayout(PipelineType t) const { return m_pipelines[static_cast<int>(t)].descriptorSetLayout; }

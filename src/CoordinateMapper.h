@@ -1,30 +1,37 @@
 #pragma once
-#include <QRect>
+
+#include <QRectF>
 #include <QPointF>
+#include "AudioEQTypes.h"
 
-class CoordinateMapper {
+class AUDIOEQ_EXPORT CoordinateMapper {
 public:
-	CoordinateMapper(QRect viewport, double freqMin, double freqMax, double gainMin, double gainMax);
+    CoordinateMapper();
 
-	double freqToX(double freqHz) const;
-	double gainToY(double gainDb) const;
-	double xToFreq(double x) const;
-	double yToGain(double y) const;
+    void setViewport(const QRectF& rect);
+    QRectF viewport() const;
 
-	void setViewport(QRect viewport);
-	void setFreqRange(double min, double max);
-	void setGainRange(double min, double max);
+    void setSampleRate(SampleRate rate);
 
-	double freqMin() const;
-	double freqMax() const;
-	double gainMin() const;
-	double gainMax() const;
-	QRect viewport() const;
+    double freqToX(double freqHz) const;
+    double xToFreq(double x) const;
+
+    double gainToY(double gainDb) const;
+    double yToGain(double y) const;
+
+    QPointF toPixel(double freqHz, double gainDb) const;
+
+    void setGainRange(double minDb, double maxDb);
+    double gainMin() const;
+    double gainMax() const;
+
+    double freqMin() const;
+    double freqMax() const;
 
 private:
-	QRect m_viewport;
-	double m_freqMin;
-	double m_freqMax;
-	double m_gainMin;
-	double m_gainMax;
+    QRectF  m_viewport;
+    double  m_gainMin = -48.0;
+    double  m_gainMax = +48.0;
+    double  m_freqMin = 20.0;
+    double  m_freqMax = 22050.0;
 };

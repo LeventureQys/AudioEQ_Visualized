@@ -1,28 +1,15 @@
-#include "filter/FilterAlgorithmFactory.h"
-#include <unordered_map>
+#include "FilterAlgorithmFactory.h"
+#include "ButterworthIIR.h"
 
-namespace {
-
-std::unordered_map<FilterAlgorithmType, std::function<std::unique_ptr<FilterAlgorithm>()>>& registry()
-{
-	static std::unordered_map<FilterAlgorithmType, std::function<std::unique_ptr<FilterAlgorithm>()>> map;
-	return map;
-}
-
-} // namespace
-
-std::unique_ptr<FilterAlgorithm> FilterAlgorithmFactory::create(FilterAlgorithmType algoType)
-{
-	auto& map = registry();
-	auto it = map.find(algoType);
-	if (it != map.end()) {
-		return it->second();
-	}
-	return nullptr;
-}
-
-void FilterAlgorithmFactory::registerAlgorithm(FilterAlgorithmType algoType,
-                                               std::function<std::unique_ptr<FilterAlgorithm>()> creator)
-{
-	registry()[algoType] = std::move(creator);
+std::unique_ptr<FilterAlgorithm> FilterAlgorithmFactory::create(
+    FilterType type,
+    FilterAlgorithmType algo,
+    double freqHz,
+    double gainDb,
+    double q
+) {
+    if (algo == FilterAlgorithmType::ButterworthIIR) {
+        return std::make_unique<ButterworthIIR>(type, freqHz, gainDb, q);
+    }
+    return nullptr;
 }

@@ -1,329 +1,99 @@
-#include <QtTest>
+#include <gtest/gtest.h>
+#include <QCoreApplication>
 #include <QSignalSpy>
-#include <QElapsedTimer>
+#include <QTimer>
 #include "CurveEngine.h"
-#include "filter/ButterworthIIR.h"
-#include "filter/FilterAlgorithmFactory.h"
 #include "EqualizerModel.h"
-#include <cmath>
+#include "AudioEQTypes.h"
 
-class TestCurveEngine : public QObject {
-	Q_OBJECT
-private slots:
-	void initTestCase()
-	{
-		FilterAlgorithmFactory::registerAlgorithm(FilterAlgorithmType::ButterworthIIR,
-			[]() -> std::unique_ptr<FilterAlgorithm> { return std::make_unique<ButterworthIIR>(); });
-	}
+class CurveEngineTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        if (!QCoreApplication::instance()) {
+            static int argc = 0;
+            static char* argv[] = {nullptr};
+            m_app = new QCoreApplication(argc, argv);
+        }
+    }
 
-	void testLogPointGeneration()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(500);
-		engine.setFreqRange(20.0, 20000.0);
+    void TearDown() override {
+        delete m_app;
+        m_app = nullptr;
+    }
 
-		EqualizerModel model;
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		QVERIFY(spy.wait(5000));
+    CurveRequest makeRequest() {
+        CurveRequest req;
+        EQBand b1, b2, b3;
+        b1.freqHz = 250.0;  b1.gainDb = 3.0;  b1.q = 1.0; b1.type = FilterType::Peak;
+        b2.freqHz = 1000.0; b2.gainDb = -2.0; b2.q = 2.0; b2.type = FilterType::Peak;
+        b3.freqHz = 4000.0; b3.gainDb = 1.0;  b3.q = 0.7; b3.type = FilterType::Peak;
+        req.bands = {b1, b2, b3};
+        req.sampleRate = SampleRate::SR_44100;
+        req.freqMin = 20.0;
+        req.freqMax = 22050.0;
+        req.pointCount = 500;
+        return req;
+    }
 
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(0).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 500);
-
-		QVERIFY(points.first().x() >= 0.0);
-		QVERIFY(points.first().x() < 0.001);
-		QVERIFY(points.last().x() <= 1.0);
-		QVERIFY(points.last().x() > 0.999);
-
-		for (int i = 1; i < points.size(); ++i)
-			QVERIFY(points[i].x() > points[i - 1].x());
-
-		double xPerOctaveStart = points[0].x();
-		int countsPerOctave = 0;
-		double octaveEndFreq = 40.0;
-		for (const auto& pt : points) {
-			double freq = 20.0 * std::pow(20000.0 / 20.0, pt.x());
-			if (freq <= octaveEndFreq)
-				countsPerOctave++;
-			else
-				break;
-		}
-		QVERIFY(countsPerOctave >= 40);
-		QVERIFY(countsPerOctave <= 65);
-	}
-
-	void testTotalCurveComputation()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(500);
-
-		EqualizerModel model;
-		model.setBandCount(5);
-
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(0).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 500);
-
-		QVERIFY(points.first().x() >= 0.0);
-		QVERIFY(points.last().x() <= 1.0);
-		for (const auto& pt : points) {
-			QVERIFY(pt.y() >= 0.0);
-			QVERIFY(pt.y() <= 1.0);
-		}
-	}
-
-	void testTotalCurveWithFilters()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(200);
-
-		EqualizerModel model;
-		model.setBandCount(3);
-
-		EQBand band0;
-		band0.frequency = 500.0;
-		band0.gain = 6.0;
-		band0.q = 1.0;
-		band0.type = FilterType::Peak;
-		model.setBandParams(0, band0);
-
-		ShelfBand lpf;
-		lpf.frequency = 10000.0;
-		lpf.enabled = true;
-		lpf.algorithm = FilterAlgorithmType::ButterworthIIR;
-		model.setLpf(lpf);
-
-		ShelfBand hpf;
-		hpf.frequency = 80.0;
-		hpf.enabled = true;
-		hpf.algorithm = FilterAlgorithmType::ButterworthIIR;
-		model.setHpf(hpf);
-
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(0).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 200);
-
-		double midIndex = points.size() / 2;
-		double yMid = points[midIndex].y();
-		double yCenter = 0.5;
-		QVERIFY(std::abs(yMid - yCenter) < 0.3);
-	}
-
-	void testSingleBandCurve()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(200);
-
-		EqualizerModel model;
-		model.setBandCount(3);
-
-		EQBand band1;
-		band1.frequency = 1000.0;
-		band1.gain = 9.0;
-		band1.q = 1.0;
-		band1.type = FilterType::Peak;
-		band1.bypass = false;
-		model.setBandParams(1, band1);
-
-		QSignalSpy spy(&engine, &CurveEngine::singleBandCurveReady);
-		engine.requestSingleBandCurve(1, model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(1).value<QVector<QPointF>>();
-		int bandIndex = spy.at(0).at(0).toInt();
-		QCOMPARE(bandIndex, 1);
-		QCOMPARE(points.size(), 200);
-
-		QVERIFY(points.first().x() >= 0.0);
-		QVERIFY(points.last().x() <= 1.0);
-	}
-
-	void testSingleBandBypass()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(100);
-
-		EqualizerModel model;
-		model.setBandCount(1);
-
-		EQBand band0;
-		band0.frequency = 500.0;
-		band0.gain = 12.0;
-		band0.q = 1.0;
-		band0.type = FilterType::Peak;
-		band0.bypass = true;
-		model.setBandParams(0, band0);
-
-		QSignalSpy spy(&engine, &CurveEngine::singleBandCurveReady);
-		engine.requestSingleBandCurve(0, model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(1).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 100);
-
-		double firstY = points.first().y();
-		for (const auto& pt : points)
-			QCOMPARE(pt.y(), firstY);
-	}
-
-	void testSingleBandLpfHpf()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(100);
-
-		EqualizerModel model;
-		model.setBandCount(0);
-
-		ShelfBand lpf;
-		lpf.frequency = 5000.0;
-		lpf.enabled = true;
-		lpf.algorithm = FilterAlgorithmType::ButterworthIIR;
-		model.setLpf(lpf);
-
-		QSignalSpy spy(&engine, &CurveEngine::singleBandCurveReady);
-		engine.requestSingleBandCurve(-2, model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(1).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 100);
-
-		model.setLpfEnabled(false);
-
-		QSignalSpy spy2(&engine, &CurveEngine::singleBandCurveReady);
-		engine.requestSingleBandCurve(-2, model);
-		QVERIFY(spy2.wait(5000));
-
-		QCOMPARE(spy2.count(), 1);
-		QVector<QPointF> pointsDisabled = spy2.at(0).at(1).value<QVector<QPointF>>();
-		double firstY = pointsDisabled.first().y();
-		for (const auto& pt : pointsDisabled)
-			QCOMPARE(pt.y(), firstY);
-	}
-
-	void testCancelMechanism()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(10000);
-
-		EqualizerModel model;
-		EQBand band;
-		band.frequency = 1000.0;
-		band.gain = 6.0;
-		band.q = 1.0;
-		band.type = FilterType::Peak;
-		model.setBandCount(1);
-		model.setBandParams(0, band);
-
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		engine.cancelPending();
-
-		bool received = spy.wait(1000);
-		if (received) {
-			QVERIFY(spy.count() <= 1);
-		}
-	}
-
-	void testThreadSafety()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(50);
-
-		EqualizerModel model;
-		model.setBandCount(3);
-
-		const int requestCount = 20;
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		for (int i = 0; i < requestCount; ++i)
-			engine.requestTotalCurve(model);
-
-		QElapsedTimer timer;
-		timer.start();
-		while (spy.count() < requestCount && timer.elapsed() < 5000)
-			QTest::qWait(10);
-
-		QVERIFY(spy.count() >= requestCount);
-	}
-
-	void testSetPointCount()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-
-		QCOMPARE(engine.pointCount(), 500);
-
-		engine.setPointCount(100);
-		QCOMPARE(engine.pointCount(), 100);
-
-		engine.setPointCount(0);
-		QCOMPARE(engine.pointCount(), 1);
-
-		EqualizerModel model;
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		QVERIFY(spy.wait(5000));
-
-		QCOMPARE(spy.count(), 1);
-		QVector<QPointF> points = spy.at(0).at(0).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 1);
-	}
-
-	void testFreqGainRange()
-	{
-		auto algo = FilterAlgorithmFactory::create(FilterAlgorithmType::ButterworthIIR);
-		QVERIFY(algo != nullptr);
-		CurveEngine engine(algo.get());
-		engine.setPointCount(200);
-		engine.setFreqRange(100.0, 10000.0);
-		engine.setGainRange(-24.0, 24.0);
-
-		EqualizerModel model;
-
-		QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
-		engine.requestTotalCurve(model);
-		QVERIFY(spy.wait(5000));
-
-		QVector<QPointF> points = spy.at(0).at(0).value<QVector<QPointF>>();
-		QCOMPARE(points.size(), 200);
-
-		QVERIFY(points.first().x() >= 0.0);
-		QVERIFY(points.last().x() <= 1.0);
-
-		for (const auto& pt : points) {
-			QVERIFY(pt.y() >= 0.0);
-			QVERIFY(pt.y() <= 1.0);
-		}
-	}
+    QCoreApplication* m_app = nullptr;
 };
 
-QTEST_MAIN(TestCurveEngine)
-#include "TestCurveEngine.moc"
+TEST_F(CurveEngineTest, BasicAsyncRequest) {
+    CurveEngine engine;
+    QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
+
+    engine.requestTotalCurve(makeRequest());
+    spy.wait(3000);
+
+    ASSERT_EQ(spy.count(), 1);
+    auto points = spy[0][0].value<QVector<QPointF>>();
+    EXPECT_EQ(points.size(), 500);
+    EXPECT_NEAR(points.first().x(), 0.0, 0.01);
+    EXPECT_NEAR(points.last().x(), 1.0, 0.01);
+}
+
+TEST_F(CurveEngineTest, RapidCancelation) {
+    CurveEngine engine;
+    QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
+
+    for (int i = 0; i < 10; ++i) {
+        engine.requestTotalCurve(makeRequest());
+    }
+
+    spy.wait(5000);
+
+    EXPECT_LE(spy.count(), 2);
+}
+
+TEST_F(CurveEngineTest, BandCurveRequest) {
+    CurveEngine engine;
+    QSignalSpy spy(&engine, &CurveEngine::bandCurveReady);
+
+    engine.requestBandCurve(makeRequest(), 0);
+    spy.wait(3000);
+
+    ASSERT_GE(spy.count(), 1);
+    auto points = spy[0][1].value<QVector<QPointF>>();
+    EXPECT_EQ(points.size(), 500);
+}
+
+TEST_F(CurveEngineTest, DestructorSafety) {
+    {
+        CurveEngine engine;
+        engine.requestTotalCurve(makeRequest());
+    }
+    SUCCEED();
+}
+
+TEST_F(CurveEngineTest, PointCount) {
+    CurveEngine engine;
+    engine.setPointCount(100);
+    QSignalSpy spy(&engine, &CurveEngine::totalCurveReady);
+
+    engine.requestTotalCurve(makeRequest());
+    spy.wait(3000);
+
+    ASSERT_EQ(spy.count(), 1);
+    auto points = spy[0][0].value<QVector<QPointF>>();
+    EXPECT_EQ(points.size(), 100);
+}

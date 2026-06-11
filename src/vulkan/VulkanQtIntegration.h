@@ -1,34 +1,28 @@
 #pragma once
-#include <QWidget>
-#include <memory>
+
+#include <QWindow>
+#include <QVulkanInstance>
+#include "volk.h"
 
 class VulkanContext;
-class VulkanSwapchain;
-class VulkanPipeline;
-class VulkanBufferPool;
-class VulkanFontAtlas;
-class VulkanFrameSync;
 class VulkanRenderer;
 
-class VulkanQtIntegration {
+class VulkanQtWindow : public QWindow {
+    Q_OBJECT
 public:
-	VulkanQtIntegration();
-	~VulkanQtIntegration();
+    explicit VulkanQtWindow(VulkanContext* ctx, VulkanRenderer* renderer, QWindow* parent = nullptr);
+    ~VulkanQtWindow() override;
 
-	bool initialize(QWidget* parentWidget);
-	void cleanup();
+    VkSurfaceKHR vkSurface() const;
+    void requestRender();
 
-	VulkanContext* context() const;
-	VulkanRenderer* renderer() const;
-	VulkanSwapchain* swapchain() const;
+protected:
+    void exposeEvent(QExposeEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
+    bool event(QEvent* e) override;
 
 private:
-	std::unique_ptr<VulkanContext> m_context;
-	std::unique_ptr<VulkanSwapchain> m_swapchain;
-	std::unique_ptr<VulkanPipeline> m_pipeline;
-	std::unique_ptr<VulkanBufferPool> m_bufferPool;
-	std::unique_ptr<VulkanFontAtlas> m_fontAtlas;
-	std::unique_ptr<VulkanFrameSync> m_frameSync;
-	std::unique_ptr<VulkanRenderer> m_renderer;
-	QWidget* m_widget = nullptr;
+    VulkanContext*  m_ctx;
+    VulkanRenderer* m_renderer;
+    bool            m_initialized = false;
 };

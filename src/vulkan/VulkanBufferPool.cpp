@@ -1,202 +1,135 @@
-#include "vulkan/VulkanBufferPool.h"
-#include "vulkan/VulkanContext.h"
+#include "VulkanBufferPool.h"
+#include "VulkanContext.h"
 #include <cstring>
 
-VulkanBufferPool::VulkanBufferPool()
-{
+VulkanBufferPool::VulkanBufferPool(VulkanContext* ctx) : m_ctx(ctx) {}
+VulkanBufferPool::~VulkanBufferPool() {
+    if (m_commandPool) {
+        vkDestroyCommandPool(m_ctx->device(), m_commandPool, nullptr);
+    }
 }
 
-VulkanBufferPool::~VulkanBufferPool()
-{
-	cleanup();
+void VulkanBufferPool::ensureCommandPool() {
+    if (m_commandPool) return;
+    VkCommandPoolCreateInfo ci = {};
+    ci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    ci.queueFamilyIndex = m_ctx->graphicsFamily();
+    ci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    vkCreateCommandPool(m_ctx->device(), &ci, nullptr, &m_commandPool);
 }
 
-bool VulkanBufferPool::initialize(VulkanContext* ctx)
-{
-	if (!ctx || ctx->device() == VK_NULL_HANDLE) {
-		return false;
-	}
-	m_context = ctx;
-	return true;
+VkCommandBuffer VulkanBufferPool::beginOneShot() {
+    ensureCommandPool();
+    VkCommandBufferAllocateInfo ai = {};
+    ai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    ai.commandPool = m_commandPool;
+    ai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    ai.commandBufferCount = 1;
+    VkCommandBuffer cmd;
+    vkAllocateCommandBuffers(m_ctx->device(), &ai, &cmd);
+
+    VkCommandBufferBeginInfo bi = {};
+    bi.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    bi.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(cmd, &bi);
+    return cmd;
 }
 
-void VulkanBufferPool::cleanup()
-{
-	if (!m_context) {
-		return;
-	}
-
-	for (VkBuffer buffer : m_buffers) {
-		vkDestroyBuffer(m_context->device(), buffer, nullptr);
-	}
-	m_buffers.clear();
-
-	for (VkDeviceMemory memory : m_memories) {
-		vkFreeMemory(m_context->device(), memory, nullptr);
-	}
-	m_memories.clear();
-
-	m_context = nullptr;
+void VulkanBufferPool::endOneShot(VkCommandBuffer cmd) {
+    vkEndCommandBuffer(cmd);
+    VkSubmitInfo si = {};
+    si.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    si.commandBufferCount = 1;
+    si.pCommandBuffers = &cmd;
+    vkQueueSubmit(m_ctx->graphicsQueue(), 1, &si, VK_NULL_HANDLE);
+    vkQueueWaitIdle(m_ctx->graphicsQueue());
+    vkFreeCommandBuffers(m_ctx->device(), m_commandPool, 1, &cmd);
 }
 
-void VulkanBufferPool::freeBuffer(VkBuffer buffer)
-{
-	if (!m_context || buffer == VK_NULL_HANDLE) {
-		return;
-	}
-
-	int index = m_buffers.indexOf(buffer);
-	if (index < 0) {
-		return;
-	}
-
-	vkDestroyBuffer(m_context->device(), buffer, nullptr);
-	vkFreeMemory(m_context->device(), m_memories[index], nullptr);
-
-	m_buffers.removeAt(index);
-	m_memories.removeAt(index);
+uint32_t VulkanBufferPool::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags props) {
+    VkPhysicalDeviceMemoryProperties memProps;
+    vkGetPhysicalDeviceMemoryProperties(m_ctx->physicalDevice(), &memProps);
+    for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i) {
+        if ((typeFilter & (1 << i)) && (memProps.memoryTypes[i].propertyFlags & props) == props)
+            return i;
+    }
+    return 0;
 }
 
-VulkanBufferPool::BufferAllocation VulkanBufferPool::createBuffer(VkDeviceSize size,
-	VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
-{
-	BufferAllocation result{};
+BufferAllocation VulkanBufferPool::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags props) {
+    BufferAllocation alloc;
+    alloc.size = size;
 
-	VkBufferCreateInfo bufferInfo{};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    VkBufferCreateInfo bi = {};
+    bi.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bi.size = size;
+    bi.usage = usage;
+    bi.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    vkCreateBuffer(m_ctx->device(), &bi, nullptr, &alloc.buffer);
 
-	if (vkCreateBuffer(m_context->device(), &bufferInfo, nullptr, &result.buffer) != VK_SUCCESS) {
-		return { VK_NULL_HANDLE, VK_NULL_HANDLE };
-	}
+    VkMemoryRequirements memReq;
+    vkGetBufferMemoryRequirements(m_ctx->device(), alloc.buffer, &memReq);
 
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(m_context->device(), result.buffer, &memRequirements);
+    VkMemoryAllocateInfo ai = {};
+    ai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    ai.allocationSize = memReq.size;
+    ai.memoryTypeIndex = findMemoryType(memReq.memoryTypeBits, props);
+    vkAllocateMemory(m_ctx->device(), &ai, nullptr, &alloc.memory);
+    vkBindBufferMemory(m_ctx->device(), alloc.buffer, alloc.memory, 0);
 
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+    if (props & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+        vkMapMemory(m_ctx->device(), alloc.memory, 0, size, 0, &alloc.mapped);
+    }
 
-	if (vkAllocateMemory(m_context->device(), &allocInfo, nullptr, &result.memory) != VK_SUCCESS) {
-		vkDestroyBuffer(m_context->device(), result.buffer, nullptr);
-		return { VK_NULL_HANDLE, VK_NULL_HANDLE };
-	}
-
-	vkBindBufferMemory(m_context->device(), result.buffer, result.memory, 0);
-
-	m_buffers.append(result.buffer);
-	m_memories.append(result.memory);
-
-	return result;
+    return alloc;
 }
 
-VkBuffer VulkanBufferPool::allocateVertexBuffer(VkDeviceSize size, const void* data)
-{
-	if (!m_context) {
-		return VK_NULL_HANDLE;
-	}
-
-	BufferAllocation alloc = createBuffer(size,
-		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	if (alloc.buffer == VK_NULL_HANDLE) {
-		return VK_NULL_HANDLE;
-	}
-
-	if (data) {
-		copyDataToBuffer(alloc.buffer, size, data);
-	}
-
-	return alloc.buffer;
+BufferAllocation VulkanBufferPool::createVertexBuffer(VkDeviceSize size) {
+    return createBuffer(size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 
-VkBuffer VulkanBufferPool::allocateIndexBuffer(VkDeviceSize size, const void* data)
-{
-	if (!m_context) {
-		return VK_NULL_HANDLE;
-	}
-
-	BufferAllocation alloc = createBuffer(size,
-		VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	if (alloc.buffer == VK_NULL_HANDLE) {
-		return VK_NULL_HANDLE;
-	}
-
-	if (data) {
-		copyDataToBuffer(alloc.buffer, size, data);
-	}
-
-	return alloc.buffer;
+BufferAllocation VulkanBufferPool::createIndexBuffer(VkDeviceSize size) {
+    return createBuffer(size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 }
 
-VkBuffer VulkanBufferPool::allocateUniformBuffer(VkDeviceSize size)
-{
-	if (!m_context) {
-		return VK_NULL_HANDLE;
-	}
-
-	BufferAllocation alloc = createBuffer(size,
-		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	return alloc.buffer;
+BufferAllocation VulkanBufferPool::createUniformBuffer(VkDeviceSize size) {
+    return createBuffer(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void VulkanBufferPool::updateUniformBuffer(VkBuffer buffer, VkDeviceSize size, const void* data)
-{
-	if (!m_context || buffer == VK_NULL_HANDLE || !data) {
-		return;
-	}
+void VulkanBufferPool::uploadData(const BufferAllocation& dst, const void* data, VkDeviceSize size) {
+    // Create staging buffer
+    BufferAllocation staging = createBuffer(
+        size,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
 
-	int index = m_buffers.indexOf(buffer);
-	if (index < 0) {
-		return;
-	}
+    // Copy data to staging
+    memcpy(staging.mapped, data, size);
 
-	void* mapped = nullptr;
-	vkMapMemory(m_context->device(), m_memories[index], 0, size, 0, &mapped);
-	if (mapped) {
-		std::memcpy(mapped, data, static_cast<size_t>(size));
-		vkUnmapMemory(m_context->device(), m_memories[index]);
-	}
+    // Copy from staging to device-local buffer
+    VkCommandBuffer cmd = beginOneShot();
+    VkBufferCopy copyRegion = {0, 0, size};
+    vkCmdCopyBuffer(cmd, staging.buffer, dst.buffer, 1, &copyRegion);
+    endOneShot(cmd);
+
+    // Free staging
+    free(staging);
 }
 
-void VulkanBufferPool::copyDataToBuffer(VkBuffer buffer, VkDeviceSize size, const void* data)
-{
-	if (!m_context || buffer == VK_NULL_HANDLE || !data) {
-		return;
-	}
-
-	int index = m_buffers.indexOf(buffer);
-	if (index < 0) {
-		return;
-	}
-
-	void* mapped = nullptr;
-	vkMapMemory(m_context->device(), m_memories[index], 0, size, 0, &mapped);
-	if (mapped) {
-		std::memcpy(mapped, data, static_cast<size_t>(size));
-		vkUnmapMemory(m_context->device(), m_memories[index]);
-	}
-}
-
-uint32_t VulkanBufferPool::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-{
-	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(m_context->physicalDevice(), &memProperties);
-
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
-		if ((typeFilter & (1u << i)) &&
-			(memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-			return i;
-		}
-	}
-
-	return 0;
+void VulkanBufferPool::free(BufferAllocation& alloc) {
+    VkDevice dev = m_ctx->device();
+    if (alloc.mapped) {
+        vkUnmapMemory(dev, alloc.memory);
+        alloc.mapped = nullptr;
+    }
+    if (alloc.buffer) {
+        vkDestroyBuffer(dev, alloc.buffer, nullptr);
+        alloc.buffer = VK_NULL_HANDLE;
+    }
+    if (alloc.memory) {
+        vkFreeMemory(dev, alloc.memory, nullptr);
+        alloc.memory = VK_NULL_HANDLE;
+    }
+    alloc.size = 0;
 }

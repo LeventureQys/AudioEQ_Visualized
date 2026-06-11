@@ -1,12 +1,6 @@
 #version 450
-
+layout(location = 0) in vec4 fragColor;
 layout(location = 0) out vec4 outColor;
-
-layout(set = 0, binding = 1) uniform FillParams {
-	vec4 fillColor;
-};
-
-void main()
-{
-	outColor = fillColor;
+void main() {
+    outColor = fragColor;
 }

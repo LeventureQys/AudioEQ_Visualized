@@ -1,55 +1,88 @@
 #pragma once
+
 #include <QObject>
 #include <QVector>
+#include <QMap>
+#include <QPair>
 #include "AudioEQTypes.h"
+
+#ifndef AUDIOEQ_EXPORT
+  #ifdef _WIN32
+    #define AUDIOEQ_EXPORT __declspec(dllimport)
+  #else
+    #define AUDIOEQ_EXPORT
+  #endif
+#endif
 
 class AUDIOEQ_EXPORT EqualizerModel : public QObject {
     Q_OBJECT
+
 public:
     explicit EqualizerModel(QObject* parent = nullptr);
 
+    // ── Band CRUD ──────────────────────────────
     int  bandCount() const;
-    ResultCode setBandCount(int count);
-
     ResultCode addBand(const EQBand& band, int* outIndex = nullptr);
     ResultCode removeBand(int index);
+    EQBand band(int index) const;
+    ResultCode setBand(int index, const EQBand& params);
+    ResultCode setBandFrequency(int index, double freqHz);
+    ResultCode setBandGain(int index, double gainDb);
+    ResultCode setBandQ(int index, double q);
+    ResultCode setBandType(int index, FilterType type);
+    ResultCode setBandAlgorithm(int index, FilterAlgorithmType algo);
+    ResultCode setBandBypass(int index, bool bypass);
 
-    const EQBand& bandAt(int index) const;
-    ResultCode setBandParams(int index, const EQBand& params);
-    QVector<EQBand> allBands() const;
+    // ── LPF ─────────────────────────────────────
+    ShelfBand lpf() const;
+    ResultCode setLpfEnabled(bool enabled);
+    ResultCode setLpfFrequency(double freqHz);
+    ResultCode setLpfAlgorithm(FilterAlgorithmType algo);
 
-    int  focusedBandIndex() const;
-    void setFocusedBandIndex(int index);
-    ResultCode moveBandZOrder(int fromIndex, int toIndex);
+    // ── HPF ─────────────────────────────────────
+    ShelfBand hpf() const;
+    ResultCode setHpfEnabled(bool enabled);
+    ResultCode setHpfFrequency(double freqHz);
+    ResultCode setHpfAlgorithm(FilterAlgorithmType algo);
 
+    // ── Sample Rate ─────────────────────────────
     SampleRate sampleRate() const;
     ResultCode setSampleRate(SampleRate rate);
-    double nyquistFrequency() const;
 
-    ShelfBand lpf() const;
-    ResultCode setLpf(const ShelfBand& lpf);
-    ShelfBand hpf() const;
-    ResultCode setHpf(const ShelfBand& hpf);
+    // ── Focus ───────────────────────────────────
+    int  focusedBandIndex() const;          // -1 = no focus
+    void setFocusedBandIndex(int index);
 
-    ResultCode setLpfEnabled(bool enabled);
-    ResultCode setHpfEnabled(bool enabled);
+    // ── Gain Range ──────────────────────────────
+    double gainMin() const;
+    double gainMax() const;
+    ResultCode setGainRange(double minDb, double maxDb);
+
+    // ── Q Range (per FilterType) ────────────────
+    ResultCode setQRange(FilterType type, double minQ, double maxQ);
+    double qMin(FilterType type) const;
+    double qMax(FilterType type) const;
 
 signals:
     void bandChanged(int index);
     void bandAdded(int index);
     void bandRemoved(int index);
-    void bandCountChanged(int newCount);
-    void focusedBandChanged(int index);
-    void sampleRateChanged(SampleRate rate);
     void lpfChanged();
     void hpfChanged();
-    void modelReset();
+    void sampleRateChanged(SampleRate rate);
+    void focusedBandChanged(int index);
+    void gainRangeChanged(double minDb, double maxDb);
 
 private:
-    QVector<EQBand> m_bands;
-    int m_focusedBandIndex = -1;
-    SampleRate m_sampleRate = SampleRate::SR_44100;
-    ShelfBand m_lpf;
-    ShelfBand m_hpf;
-    int m_nextIndex = 0;
+    int findFreeIndex() const;
+    bool isValidIndex(int index) const;
+
+    QVector<EQBand>  m_bands;
+    ShelfBand        m_lpf;
+    ShelfBand        m_hpf;
+    SampleRate       m_sampleRate = SampleRate::SR_44100;
+    int              m_focusedIdx = -1;
+    double           m_gainMin    = -48.0;
+    double           m_gainMax    = +48.0;
+    QMap<FilterType, QPair<double, double>> m_qRanges;
 };

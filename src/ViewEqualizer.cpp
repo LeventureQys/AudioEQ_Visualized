@@ -116,7 +116,9 @@ void ViewEqualizer::updateBandHandlePosition(int index, QPoint pos) {
     if (index < 0 || index >= m_bandHandles.size()) return;
     auto* h = m_bandHandles[index];
     h->setCenter(pos);
-    h->move(pos.x() - HANDLE_RADIUS, pos.y() - HANDLE_RADIUS);
+    // BandHandle is a frameless top-level overlay → translate parent-local pos to global screen coords
+    QPoint globalCenter = mapToGlobal(pos);
+    h->move(globalCenter.x() - HANDLE_RADIUS, globalCenter.y() - HANDLE_RADIUS);
     h->resize(HANDLE_RADIUS * 2, HANDLE_RADIUS * 2);
 }
 
@@ -156,7 +158,8 @@ void ViewEqualizer::onLpfChanged() {
         double x = m_mapper->freqToX(lpf.freqHz);
         double y = m_mapper->gainToY(0.0);
         m_lpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        m_lpfHandle->move(static_cast<int>(x) - 20, static_cast<int>(y) - 12);
+        QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
+        m_lpfHandle->move(g.x() - 20, g.y() - 12);
         m_lpfHandle->raise();
     }
     if (m_window) m_window->requestRender();
@@ -170,7 +173,8 @@ void ViewEqualizer::onHpfChanged() {
         double x = m_mapper->freqToX(hpf.freqHz);
         double y = m_mapper->gainToY(0.0);
         m_hpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        m_hpfHandle->move(static_cast<int>(x) - 20, static_cast<int>(y) - 12);
+        QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
+        m_hpfHandle->move(g.x() - 20, g.y() - 12);
         m_hpfHandle->raise();
     }
     if (m_window) m_window->requestRender();

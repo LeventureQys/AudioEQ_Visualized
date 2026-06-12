@@ -86,6 +86,8 @@ private:
     void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex);
     float toNdcX(float pixelX) const;
     float toNdcY(float pixelY) const;
+    void setInnerScissor(VkCommandBuffer cmd) const;
+    void setFullScissor(VkCommandBuffer cmd) const;
     bool createDescriptorPool();
     bool allocateDescriptorSets();
     void updateUBO(int frameIdx);
@@ -129,17 +131,23 @@ private:
     VkCommandPool     m_commandPool = VK_NULL_HANDLE;
     VkCommandBuffer   m_commandBuffers[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT] = {};
 
-    QColor m_curveColor      = QColor(0, 255, 0);
-    QColor m_backgroundColor = QColor(26, 26, 26);
-    QColor m_gridColor       = QColor(255, 255, 255, 38);
-    QColor m_gridZeroColor   = QColor(255, 255, 255, 64);
-    QColor m_fillColor       = QColor(0, 255, 0, 64);
-    QColor m_glyphColor      = QColor(255, 255, 255, 255);
+    QColor m_curveColor      = QColor(0xF0, 0xA0, 0x30);  // Orange-yellow (default, overridable via setCurveColor)
+    QColor m_backgroundColor = QColor(0x26, 0x2A, 0x33);  // Dark cool-gray (overridable via setBackgroundColor)
+    QColor m_gridColor       = QColor(0x3A, 0x3F, 0x4A, 153);  // ≈ α=0.6
+    QColor m_gridZeroColor   = QColor(0x5A, 0x60, 0x70, 230);  // ≈ α=0.9
+    QColor m_axisColor       = QColor(0x5A, 0x60, 0x70, 255);  // L-shape axis, α=1.0
+    QColor m_glyphColor      = QColor(0x90, 0x98, 0xA8, 255);  // Text labels, α=1.0
+    QColor m_fillColor       = QColor(0xF0, 0xA0, 0x30, 102);  // Curve fill (reserved), α=0.4
 
-    static constexpr float MARGIN_LEFT   = 40.0f;
-    static constexpr float MARGIN_RIGHT  = 10.0f;
-    static constexpr float MARGIN_TOP    = 10.0f;
-    static constexpr float MARGIN_BOTTOM = 25.0f;
+    static constexpr float MARGIN_LEFT   = 44.0f;
+    static constexpr float MARGIN_RIGHT  = 12.0f;
+    static constexpr float MARGIN_TOP    = 14.0f;
+    static constexpr float MARGIN_BOTTOM = 28.0f;
+
+    static constexpr float LABEL_FONT_SIZE_PX         = 12.0f;
+    static constexpr float LABEL_GAP_PX               = 4.0f;
+    static constexpr float FREQ_LABEL_Y_OFFSET_PX     = 4.0f;
+    static constexpr float GAIN_LABEL_BASELINE_GAP_PX = 6.0f;
 
     VkSurfaceKHR m_surface = VK_NULL_HANDLE;
     QSize        m_size;

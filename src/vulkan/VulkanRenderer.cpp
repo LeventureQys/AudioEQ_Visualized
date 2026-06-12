@@ -5,6 +5,22 @@
 #include <cmath>
 #include <cstring>
 
+// ── Stage11: Shared frequency tick table (used by buildGridVBO and buildTextGeometry) ──
+namespace {
+struct FreqTick { double hz; const char* label; };
+constexpr FreqTick FREQ_TICKS[] = {
+    {    20.0, "20Hz"    },
+    {    50.0, "50Hz"    },
+    {   100.0, "100Hz"   },
+    {   200.0, "200Hz"   },
+    {   500.0, "500Hz"   },
+    {  2000.0, "2KHz"    },
+    {  5000.0, "5KHz"    },
+    { 10000.0, "10KHz"   },
+    { 20000.0, "20KHz"   },
+};
+} // anonymous namespace
+
 VulkanRenderer::VulkanRenderer(VulkanContext* ctx, QObject* parent)
     : QObject(parent),
       m_ctx(ctx),
@@ -166,6 +182,20 @@ void VulkanRenderer::setCoordinateMapper(const CoordinateMapper* mapper) { m_map
 void VulkanRenderer::setCurveColor(QColor c) { m_curveColor = c; }
 void VulkanRenderer::setBackgroundColor(QColor c) { m_backgroundColor = c; }
 
+void VulkanRenderer::setInnerScissor(VkCommandBuffer cmd) const {
+    VkRect2D s;
+    s.offset.x = static_cast<int32_t>(MARGIN_LEFT);
+    s.offset.y = static_cast<int32_t>(MARGIN_TOP);
+    s.extent.width  = static_cast<uint32_t>((std::max)(0, static_cast<int>(m_size.width())  - static_cast<int>(MARGIN_LEFT) - static_cast<int>(MARGIN_RIGHT)));
+    s.extent.height = static_cast<uint32_t>((std::max)(0, static_cast<int>(m_size.height()) - static_cast<int>(MARGIN_TOP)  - static_cast<int>(MARGIN_BOTTOM)));
+    vkCmdSetScissor(cmd, 0, 1, &s);
+}
+
+void VulkanRenderer::setFullScissor(VkCommandBuffer cmd) const {
+    VkRect2D s = { {0, 0}, { static_cast<uint32_t>(m_size.width()), static_cast<uint32_t>(m_size.height()) } };
+    vkCmdSetScissor(cmd, 0, 1, &s);
+}
+
 bool VulkanRenderer::createDescriptorPool()
 {
     VkDescriptorPoolSize poolSizes[2] = {};
@@ -296,10 +326,10 @@ void VulkanRenderer::updateUBO(int frameIdx)
 
     GlyphUBO glubo;
     memset(&glubo, 0, sizeof(GlyphUBO));
-    glubo.color[0] = 1.0f;
-    glubo.color[1] = 1.0f;
-    glubo.color[2] = 1.0f;
-    glubo.color[3] = 0.9f;
+    glubo.color[0] = static_cast<float>(m_glyphColor.redF());
+    glubo.color[1] = static_cast<float>(m_glyphColor.greenF());
+    glubo.color[2] = static_cast<float>(m_glyphColor.blueF());
+    glubo.color[3] = static_cast<float>(m_glyphColor.alphaF());
     if (m_glyphUBO[frameIdx].mapped)
         memcpy(m_glyphUBO[frameIdx].mapped, &glubo, sizeof(GlyphUBO));
 }
@@ -307,32 +337,29 @@ void VulkanRenderer::updateUBO(int frameIdx)
 QVector<float> VulkanRenderer::buildGridVBO(int* outVertexCount)
 {
     QVector<float> verts;
-    if (!m_mapper) {
-        *outVertexCount = 0;
-        return verts;
-    }
+    if (!m_mapper) { if (outVertexCount) *outVertexCount = 0; return verts; }
 
     double gMin = m_mapper->gainMin();
     double gMax = m_mapper->gainMax();
     double fMin = m_mapper->freqMin();
     double fMax = m_mapper->freqMax();
 
-    for (double g = gMin; g <= gMax + 1.0; g += 12.0) {
-        if (g > gMax) g = gMax;
+    constexpr double GAIN_STEP_DB = 6.0;
+
+    double g0 = std::ceil(gMin / GAIN_STEP_DB) * GAIN_STEP_DB;
+    for (double g = g0; g <= gMax + 0.001; g += GAIN_STEP_DB) {
+        if (std::abs(g) < 0.001) continue;
         float py = static_cast<float>(m_mapper->gainToY(g));
         float ny = toNdcY(py);
         float nxLeft  = toNdcX(MARGIN_LEFT);
         float nxRight = toNdcX(static_cast<float>(m_size.width()) - MARGIN_RIGHT);
         verts.append(nxLeft);  verts.append(ny);
         verts.append(nxRight); verts.append(ny);
-        if (g >= gMax) break;
     }
 
-    double freqs[] = {20,30,40,50,60,80,100,200,300,400,500,600,800,
-                      1000,2000,3000,4000,5000,6000,8000,10000,15000,20000};
-    for (double f : freqs) {
-        if (f < fMin || f > fMax) continue;
-        float px = static_cast<float>(m_mapper->freqToX(f));
+    for (const auto& tick : FREQ_TICKS) {
+        if (tick.hz < fMin || tick.hz > fMax) continue;
+        float px = static_cast<float>(m_mapper->freqToX(tick.hz));
         float nx = toNdcX(px);
         float nyTop    = toNdcY(MARGIN_TOP);
         float nyBottom = toNdcY(static_cast<float>(m_size.height()) - MARGIN_BOTTOM);
@@ -340,28 +367,7 @@ QVector<float> VulkanRenderer::buildGridVBO(int* outVertexCount)
         verts.append(nx); verts.append(nyBottom);
     }
 
-    float nyTickBottom = toNdcY(static_cast<float>(m_size.height()) - MARGIN_BOTTOM);
-    float nyTickEnd    = toNdcY(static_cast<float>(m_size.height()) - MARGIN_BOTTOM + 6.0f);
-    for (double f : freqs) {
-        if (f < fMin || f > fMax) continue;
-        float px = static_cast<float>(m_mapper->freqToX(f));
-        float nx = toNdcX(px);
-        verts.append(nx); verts.append(nyTickBottom);
-        verts.append(nx); verts.append(nyTickEnd);
-    }
-
-    float nxTickLeft  = toNdcX(MARGIN_LEFT);
-    float nxTickStart = toNdcX(MARGIN_LEFT - 6.0f);
-    for (double g = gMin; g <= gMax + 1.0; g += 12.0) {
-        if (g > gMax) g = gMax;
-        float py = static_cast<float>(m_mapper->gainToY(g));
-        float ny = toNdcY(py);
-        verts.append(nxTickLeft);  verts.append(ny);
-        verts.append(nxTickStart); verts.append(ny);
-        if (g >= gMax) break;
-    }
-
-    *outVertexCount = verts.size() / 2;
+    if (outVertexCount) *outVertexCount = verts.size() / 2;
     return verts;
 }
 
@@ -370,8 +376,6 @@ QVector<float> VulkanRenderer::buildAxisVBO()
     QVector<float> verts;
     float h = static_cast<float>(m_size.height());
     float w = static_cast<float>(m_size.width());
-    float pxOffX = 2.0f / w;
-    float pxOffY = 2.0f / h;
 
     float leftNdc   = toNdcX(MARGIN_LEFT);
     float rightNdc  = toNdcX(w - MARGIN_RIGHT);
@@ -383,17 +387,15 @@ QVector<float> VulkanRenderer::buildAxisVBO()
         verts.append(x2); verts.append(y2);
     };
 
-    addLine(leftNdc,           topNdc,    leftNdc,           bottomNdc);
-    addLine(leftNdc - pxOffX,  topNdc,    leftNdc - pxOffX,  bottomNdc);
+    // L-shape: left axis + bottom axis only
+    addLine(leftNdc, topNdc,    leftNdc, bottomNdc);    // left axis
+    addLine(leftNdc, bottomNdc, rightNdc, bottomNdc);   // bottom axis
 
-    addLine(rightNdc,          topNdc,    rightNdc,          bottomNdc);
-    addLine(rightNdc + pxOffX, topNdc,    rightNdc + pxOffX, bottomNdc);
-
-    addLine(leftNdc,           bottomNdc, rightNdc,          bottomNdc);
-    addLine(leftNdc,           bottomNdc + pxOffY, rightNdc, bottomNdc + pxOffY);
-
-    addLine(leftNdc,           topNdc,    rightNdc,          topNdc);
-    addLine(leftNdc,           topNdc - pxOffY, rightNdc,    topNdc - pxOffY);
+    if (m_mapper && m_mapper->gainMin() <= 0.0 && m_mapper->gainMax() >= 0.0) {
+        float py = static_cast<float>(m_mapper->gainToY(0.0));
+        float zeroNy = toNdcY(py);
+        addLine(leftNdc, zeroNy, rightNdc, zeroNy);
+    }
 
     return verts;
 }
@@ -404,13 +406,13 @@ QVector<float> VulkanRenderer::buildCurveVBO(const QVector<QPointF>& points, flo
     if (points.size() < 2)
         return verts;
 
-    float halfW = lineWidthPx * 0.5f;
-
     QRectF vp;
     bool hasMapper = m_mapper != nullptr;
     if (hasMapper)
         vp = m_mapper->viewport();
 
+    // Curve pipeline = LINE_STRIP with width set via vkCmdSetLineWidth.
+    // One vertex per curve point (stride 3 floats = vec2 pos + float dist; dist unused for line topology).
     for (int i = 0; i < points.size(); ++i) {
         float xPx;
         if (hasMapper)
@@ -428,11 +430,7 @@ QVector<float> VulkanRenderer::buildCurveVBO(const QVector<QPointF>& points, flo
 
         verts.append(nx);
         verts.append(ny);
-        verts.append(-halfW);
-
-        verts.append(nx);
-        verts.append(ny);
-        verts.append(halfW);
+        verts.append(0.0f);
     }
 
     return verts;
@@ -441,65 +439,107 @@ QVector<float> VulkanRenderer::buildCurveVBO(const QVector<QPointF>& points, flo
 void VulkanRenderer::buildTextGeometry()
 {
     QVector<float> verts;
-    qDebug() << "buildTextGeometry: mapper=" << (m_mapper ? "yes" : "no") << " atlas=" << (m_fontAtlas.atlasImageView() ? "yes" : "no");
-    if (m_mapper) {
-        qDebug() << "buildTextGeometry: mapper viewport=" << m_mapper->viewport() << "freqToX(1000)=" << m_mapper->freqToX(1000) << "gainToY(0)=" << m_mapper->gainToY(0);
-    }
     if (!m_mapper || !m_fontAtlas.atlasImageView())
         return;
 
-    float fontSize = 14.0f;
+    float fontSize = LABEL_FONT_SIZE_PX;
     float fontScale = fontSize / 20.0f;
-
-    auto emitQuad = [&](float x0, float y0, float x1, float y1,
-                         float u0, float v0, float u1, float v1) {
-        verts.append(x0); verts.append(y0); verts.append(u0); verts.append(v0);
-        verts.append(x1); verts.append(y0); verts.append(u1); verts.append(v0);
-        verts.append(x0); verts.append(y1); verts.append(u0); verts.append(v1);
-        verts.append(x1); verts.append(y0); verts.append(u1); verts.append(v0);
-        verts.append(x1); verts.append(y1); verts.append(u1); verts.append(v1);
-        verts.append(x0); verts.append(y1); verts.append(u0); verts.append(v1);
-    };
-
-    float h = static_cast<float>(m_size.height());
-
-    struct { double freq; QString label; } freqLabels[] = {
-        {20, "20 Hz"}, {50, "50 Hz"}, {100, "100 Hz"}, {200, "200 Hz"},
-        {500, "500 Hz"}, {1000, "1k Hz"}, {2000, "2k Hz"}, {5000, "5k Hz"},
-        {10000, "10k Hz"}, {20000, "20k Hz"}
-    };
 
     double fMax = m_mapper->freqMax();
 
-    GlyphInfo gi;
-    bool giOk = m_fontAtlas.glyphInfo('A', &gi);
-    qDebug() << "Glyph 'A':" << giOk << "uv=" << gi.uvRect << "bearing=" << gi.bearingRect << "adv=" << gi.advance;
-
-    for (auto& fl : freqLabels) {
-        if (fl.freq > fMax) continue;
-        float px = static_cast<float>(m_mapper->freqToX(fl.freq));
+    for (const auto& tick : FREQ_TICKS) {
+        if (tick.hz > fMax) continue;
+        QString labelStr = QString::fromLatin1(tick.label);
+        float px = static_cast<float>(m_mapper->freqToX(tick.hz));
 
         float textWidth = 0;
-        for (int ci = 0; ci < fl.label.length(); ++ci) {
+        for (int ci = 0; ci < labelStr.length(); ++ci) {
             GlyphInfo gi;
-            if (!m_fontAtlas.glyphInfo(fl.label[ci], &gi)) continue;
+            if (!m_fontAtlas.glyphInfo(labelStr[ci], &gi)) continue;
             textWidth += gi.advance * fontScale;
         }
         float xBase = px - textWidth / 2.0f;
-        float zeroDbY = h - MARGIN_BOTTOM;
-        float yBase = zeroDbY + 2.0f;
+
+        // Freq labels sit in the bottom margin (below the L-shape bottom axis), matching target style
+        float bottomAxisY = static_cast<float>(m_size.height()) - MARGIN_BOTTOM;
+        float yBase = bottomAxisY + FREQ_LABEL_Y_OFFSET_PX + fontSize;
+
+        yBase = (std::min)(yBase, static_cast<float>(m_size.height()) - 2.0f);
 
         float xCursor = xBase;
-        for (int ci = 0; ci < fl.label.length(); ++ci) {
+        for (int ci = 0; ci < labelStr.length(); ++ci) {
             GlyphInfo gi;
-            if (!m_fontAtlas.glyphInfo(fl.label[ci], &gi)) continue;
-
+            if (!m_fontAtlas.glyphInfo(labelStr[ci], &gi)) continue;
             float bx = xCursor + static_cast<float>(gi.bearingRect.x()) * fontScale;
-            float by = yBase - static_cast<float>(gi.bearingRect.y()) * fontScale;
+            // stb yoff convention: top-of-glyph = baseline + yoff (yoff typically negative)
+            float by = yBase + static_cast<float>(gi.bearingRect.y()) * fontScale;
             float bw = static_cast<float>(gi.bearingRect.width()) * fontScale;
             float bh = static_cast<float>(gi.bearingRect.height()) * fontScale;
 
-            by = (std::min)(by, h - 2.0f - bh);
+            by = (std::min)(by, static_cast<float>(m_size.height()) - 2.0f - bh);
+            bx = (std::max)(0.0f, bx);
+
+            float xl = toNdcX(bx);
+            float xr = toNdcX((std::min)(bx + bw, static_cast<float>(m_size.width()) - 2.0f));
+            float yt = toNdcY(by);            // pixel-top = smaller pixelY ⇒ smaller NDC.Y (Vulkan NDC: +Y down)
+            float yb = toNdcY(by + bh);       // pixel-bottom = larger pixelY ⇒ larger NDC.Y
+
+            float u0 = static_cast<float>(gi.uvRect.left());
+            float v0 = static_cast<float>(gi.uvRect.top());     // atlas top
+            float u1 = static_cast<float>(gi.uvRect.right());
+            float v1 = static_cast<float>(gi.uvRect.bottom());  // atlas bottom
+
+            // Triangle 1: top-left, top-right, bottom-left
+            verts.append({xl, yt, u0, v0});
+            verts.append({xr, yt, u1, v0});
+            verts.append({xl, yb, u0, v1});
+            // Triangle 2: top-right, bottom-right, bottom-left
+            verts.append({xr, yt, u1, v0});
+            verts.append({xr, yb, u1, v1});
+            verts.append({xl, yb, u0, v1});
+
+            xCursor += gi.advance * fontScale;
+        }
+    }
+
+    double gMin = m_mapper->gainMin();
+    double gMax = m_mapper->gainMax();
+    constexpr double GAIN_STEP_DB = 6.0;
+    double g0 = std::ceil(gMin / GAIN_STEP_DB) * GAIN_STEP_DB;
+
+    float xRightBaseline = MARGIN_LEFT - GAIN_LABEL_BASELINE_GAP_PX;
+
+    for (double g = g0; g <= gMax + 0.001; g += GAIN_STEP_DB) {
+        float py = static_cast<float>(m_mapper->gainToY(g));
+
+        QString numText;
+        if (std::abs(g) < 0.001) numText = "0";
+        else if (g > 0) numText = QString::number((int)g);
+        else numText = QString("-%1").arg((int)(-g));
+
+        float strWidth = 0;
+        for (QChar ch : numText) {
+            GlyphInfo gi;
+            if (!m_fontAtlas.glyphInfo(ch, &gi)) continue;
+            strWidth += gi.advance * fontScale;
+        }
+        float xStart = xRightBaseline - strWidth;
+
+        // Center digit vertically on the gridline (bearingY pushes top above baseline)
+        float yBase = py + fontSize * 0.5f;
+        yBase = (std::min)(yBase, static_cast<float>(m_size.height()) - 2.0f);
+
+        float currentOffset = 0;
+        for (QChar ch : numText) {
+            GlyphInfo gi;
+            if (!m_fontAtlas.glyphInfo(ch, &gi)) continue;
+
+            float bx = xStart + currentOffset + static_cast<float>(gi.bearingRect.x()) * fontScale;
+            float by = yBase + static_cast<float>(gi.bearingRect.y()) * fontScale;
+            float bw = static_cast<float>(gi.bearingRect.width()) * fontScale;
+            float bh = static_cast<float>(gi.bearingRect.height()) * fontScale;
+
+            by = (std::min)(by, static_cast<float>(m_size.height()) - 2.0f - bh);
             bx = (std::max)(0.0f, bx);
 
             float xl = toNdcX(bx);
@@ -512,68 +552,18 @@ void VulkanRenderer::buildTextGeometry()
             float u1 = static_cast<float>(gi.uvRect.right());
             float v1 = static_cast<float>(gi.uvRect.bottom());
 
-            emitQuad(xl, yb, xr, yt, u0, v1, u1, v0);
-
-            xCursor += gi.advance * fontScale;
-        }
-    }
-
-    qDebug() << "Freq labels built, vertices so far:" << verts.size()/4;
-
-    double gMin = m_mapper->gainMin();
-    double gMax = m_mapper->gainMax();
-    for (double g = gMin; g <= gMax + 1.0; g += 12.0) {
-        if (g > gMax) g = gMax;
-        float py = static_cast<float>(m_mapper->gainToY(g));
-
-        QString label;
-        if (g == 0) label = "0 dB";
-        else if (g > 0) label = QString("+%1 dB").arg((int)g);
-        else label = QString("%1 dB").arg((int)g);
-
-        float textHeight = 14.0f * fontScale;
-        float yBase = py + textHeight / 3.0f;
-
-        float textWidth = 0;
-        for (int ci = 0; ci < label.length(); ++ci) {
-            GlyphInfo gi;
-            if (!m_fontAtlas.glyphInfo(label[ci], &gi)) continue;
-            textWidth += gi.advance * fontScale;
-        }
-        float xStart = MARGIN_LEFT - 4.0f - textWidth;
-
-        float currentOffset = 0;
-        for (int ci = 0; ci < label.length(); ++ci) {
-            GlyphInfo gi;
-            if (!m_fontAtlas.glyphInfo(label[ci], &gi)) continue;
-
-            float cx = xStart + currentOffset;
-            float cy = yBase - static_cast<float>(gi.bearingRect.y()) * fontScale;
-            float bw = static_cast<float>(gi.bearingRect.width()) * fontScale;
-            float bh = static_cast<float>(gi.bearingRect.height()) * fontScale;
-
-            float xl = toNdcX(cx);
-            float xr = toNdcX(cx + bw);
-            float yt = toNdcY(cy);
-            float yb = toNdcY(cy + bh);
-
-            float u0 = static_cast<float>(gi.uvRect.left());
-            float v0 = static_cast<float>(gi.uvRect.top());
-            float u1 = static_cast<float>(gi.uvRect.right());
-            float v1 = static_cast<float>(gi.uvRect.bottom());
-
-            emitQuad(xl, yb, xr, yt, u0, v1, u1, v0);
+            verts.append({xl, yt, u0, v0});
+            verts.append({xr, yt, u1, v0});
+            verts.append({xl, yb, u0, v1});
+            verts.append({xr, yt, u1, v0});
+            verts.append({xr, yb, u1, v1});
+            verts.append({xl, yb, u0, v1});
 
             currentOffset += gi.advance * fontScale;
         }
-        if (g >= gMax) break;
     }
 
-    qDebug() << "Gain labels built, total vertices:" << verts.size()/4;
-
     m_textVertexCount = verts.size() / 4;
-
-    qDebug() << "Uploading text VBO:" << verts.size() << "floats =" << verts.size()/4 << "verts =" << verts.size()/4/6 << "glyphs";
 
     if (m_textVBO.buffer == VK_NULL_HANDLE) {
         m_textVBO = m_bufferPool.createVertexBuffer(verts.size() * sizeof(float));
@@ -784,7 +774,11 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageInde
 
     int frameIdx = m_frameSync.currentFrame();
 
-    // 1. Grid
+    // Default: full scissor
+    setFullScissor(cmd);
+
+    // 1. Grid lines → inner scissor
+    setInnerScissor(cmd);
     if (m_gridVBO.buffer != VK_NULL_HANDLE && m_gridVertexCount > 0) {
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.pipeline(PipelineType::Grid));
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.layout(PipelineType::Grid), 0, 1, &m_gridDescSet[frameIdx], 0, nullptr);
@@ -793,15 +787,17 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageInde
         vkCmdDraw(cmd, static_cast<uint32_t>(m_gridVertexCount), 1, 0, 0);
     }
 
+    // 2. Axis → full scissor (axis lines need to reach margin edges)
+    setFullScissor(cmd);
     // 1b. Axis border lines (drawn after grid for visual layering, bold white)
     if (m_axisVBO.buffer != VK_NULL_HANDLE && m_axisVertexCount > 0) {
         GridUBO axisUbo;
         memset(&axisUbo, 0, sizeof(GridUBO));
-        axisUbo.color[0] = 1.0f;
-        axisUbo.color[1] = 1.0f;
-        axisUbo.color[2] = 1.0f;
-        axisUbo.color[3] = 0.9f;
-        axisUbo.alpha     = 0.9f;
+        axisUbo.color[0] = static_cast<float>(m_axisColor.redF());
+        axisUbo.color[1] = static_cast<float>(m_axisColor.greenF());
+        axisUbo.color[2] = static_cast<float>(m_axisColor.blueF());
+        axisUbo.color[3] = static_cast<float>(m_axisColor.alphaF());
+        axisUbo.alpha    = 1.0f;
         memcpy(m_gridUBO[frameIdx].mapped, &axisUbo, sizeof(GridUBO));
 
         VkDeviceSize off = 0;
@@ -809,6 +805,8 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageInde
         vkCmdDraw(cmd, m_axisVertexCount, 1, 0, 0);
     }
 
+    // 3. Curves → inner scissor
+    setInnerScissor(cmd);
     // 2. Total Curve
     if (m_totalCurveVBO.buffer != VK_NULL_HANDLE && !m_totalCurve.isEmpty()) {
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.pipeline(PipelineType::Curve));
@@ -816,7 +814,7 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageInde
         vkCmdSetLineWidth(cmd, 2.0f);
         VkDeviceSize off = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &m_totalCurveVBO.buffer, &off);
-        uint32_t totalCurveVerts = static_cast<uint32_t>(m_totalCurve.size() * 2);
+        uint32_t totalCurveVerts = static_cast<uint32_t>(m_totalCurve.size());
         vkCmdDraw(cmd, totalCurveVerts, 1, 0, 0);
     }
 
@@ -833,10 +831,12 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageInde
         vkCmdSetLineWidth(cmd, 2.0f);
         VkDeviceSize off = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &vit->buffer, &off);
-        uint32_t bandVerts = static_cast<uint32_t>(bp.size() * 2);
+        uint32_t bandVerts = static_cast<uint32_t>(bp.size());
         vkCmdDraw(cmd, bandVerts, 1, 0, 0);
     }
 
+    // 4. Text → full scissor
+    setFullScissor(cmd);
     // 4. Text labels (Glyph pipeline)
     qDebug() << "recordCmd: textVerts=" << m_textVertexCount << " textVBO=" << (m_textVBO.buffer ? "yes" : "no");
     if (m_textVertexCount > 0 && m_textVBO.buffer != VK_NULL_HANDLE) {

@@ -57,6 +57,18 @@ int main(int argc, char* argv[]) {
     toolbar->addWidget(btnLpf);
     toolbar->addWidget(btnHpf);
 
+    // ── Stage11 visual verification: preset a target-like curve ─────────
+    // Match the target screenshot: HPF + LPF on, with a valley at 200Hz and peak at 5KHz
+    eq->setHpfEnabled(true);
+    eq->setHpfFrequency(20.0);
+    eq->setLpfEnabled(true);
+    eq->setLpfFrequency(18000.0);
+    if (eq->bandCount() >= 5) {
+        eq->setBandFrequency(2, 200.0);  eq->setBandGain(2, -18.0); eq->setBandQ(2, 2.5);
+        eq->setBandFrequency(3, 5000.0); eq->setBandGain(3, +6.0);  eq->setBandQ(3, 1.2);
+        eq->setBandFrequency(4, 10000.0);eq->setBandGain(4, -4.0);  eq->setBandQ(4, 4.0);
+    }
+
     window.show();
     return app.exec();
 }

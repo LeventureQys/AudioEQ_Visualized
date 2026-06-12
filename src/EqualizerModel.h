@@ -82,7 +82,7 @@ private:
     ShelfBand        m_hpf;
     SampleRate       m_sampleRate = SampleRate::SR_44100;
     int              m_focusedIdx = -1;
-    double           m_gainMin    = -48.0;
-    double           m_gainMax    = +48.0;
+    double           m_gainMin    = -18.0;
+    double           m_gainMax    = +12.0;
     QMap<FilterType, QPair<double, double>> m_qRanges;
 };

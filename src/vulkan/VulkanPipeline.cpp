@@ -153,6 +153,8 @@ bool VulkanPipeline::createPipeline(PipelineType type, VkRenderPass renderPass) 
     ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     if (type == PipelineType::Grid)
         ia.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    else if (type == PipelineType::Curve)
+        ia.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
     else if (type == PipelineType::Glyph)
         ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     else

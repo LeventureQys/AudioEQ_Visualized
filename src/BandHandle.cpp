@@ -1,13 +1,18 @@
 #include "BandHandle.h"
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 
 BandHandle::BandHandle(int bandIndex, QWidget* parent)
     : QWidget(parent)
     , m_bandIndex(bandIndex)
 {
-    setAttribute(Qt::WA_TransparentForMouseEvents, false);
+    // Frameless top-level overlay so it can be drawn on top of the Vulkan child window
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_NoSystemBackground, true);
+    setAttribute(Qt::WA_ShowWithoutActivating, true);
+    setAttribute(Qt::WA_TransparentForMouseEvents, false);
     setMouseTracking(false);
 
     m_throttleTimer.setSingleShot(true);
@@ -27,11 +32,30 @@ int BandHandle::bandIndex() const {
 }
 
 void BandHandle::paintEvent(QPaintEvent*) {
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
+
+    const int r = HANDLE_RADIUS - 2;            // inset 2px for stroke
+    const QPoint c(width() / 2, height() / 2);
+    QRect circle(c.x() - r, c.y() - r, 2 * r, 2 * r);
+
+    // Filled circle (dark fill, similar to target sample)
+    p.setBrush(QColor(0x3D, 0x44, 0x4F, 235));   // #3D444F, slightly translucent
+    p.setPen(QPen(QColor(0x9A, 0xA2, 0xB0, 255), 1.4));
+    p.drawEllipse(circle);
+
+    // Index label centered
+    p.setPen(QColor(0xE0, 0xE4, 0xEC, 255));
+    QFont f = p.font();
+    f.setPointSizeF(9.0);
+    f.setBold(true);
+    p.setFont(f);
+    p.drawText(circle, Qt::AlignCenter, QString::number(m_bandIndex));
 }
 
 void BandHandle::mousePressEvent(QMouseEvent* event) {
-    int dx = event->pos().x() - m_center.x();
-    int dy = event->pos().y() - m_center.y();
+    int dx = event->pos().x() - width() / 2;
+    int dy = event->pos().y() - height() / 2;
     int distSq = dx * dx + dy * dy;
 
     if (distSq > HANDLE_RADIUS * HANDLE_RADIUS) {

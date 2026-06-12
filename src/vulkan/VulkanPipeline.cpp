@@ -52,8 +52,12 @@ VkDescriptorSetLayout VulkanPipeline::createDescriptorSetLayout(PipelineType typ
     ci.bindingCount = static_cast<uint32_t>(bindings.size());
     ci.pBindings = bindings.data();
 
-    VkDescriptorSetLayout layout;
-    vkCreateDescriptorSetLayout(m_ctx->device(), &ci, nullptr, &layout);
+    VkDescriptorSetLayout layout = VK_NULL_HANDLE;
+    VkResult r = vkCreateDescriptorSetLayout(m_ctx->device(), &ci, nullptr, &layout);
+    if (r != VK_SUCCESS) {
+        qWarning() << "VulkanPipeline: vkCreateDescriptorSetLayout failed:" << r;
+        return VK_NULL_HANDLE;
+    }
     return layout;
 }
 
@@ -147,7 +151,12 @@ bool VulkanPipeline::createPipeline(PipelineType type, VkRenderPass renderPass) 
 
     VkPipelineInputAssemblyStateCreateInfo ia = {};
     ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    ia.topology = (type == PipelineType::Grid) ? VK_PRIMITIVE_TOPOLOGY_LINE_LIST : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    if (type == PipelineType::Grid)
+        ia.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    else if (type == PipelineType::Glyph)
+        ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    else
+        ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 
     VkViewport vp = {0, 0, (float)1000, (float)800, 0, 1};
     VkRect2D scissor = {{0,0}, {1000,800}};
@@ -199,7 +208,11 @@ bool VulkanPipeline::createPipeline(PipelineType type, VkRenderPass renderPass) 
     pl.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pl.setLayoutCount = 1;
     pl.pSetLayouts = &ps.descriptorSetLayout;
-    vkCreatePipelineLayout(m_ctx->device(), &pl, nullptr, &ps.layout);
+    VkResult plr = vkCreatePipelineLayout(m_ctx->device(), &pl, nullptr, &ps.layout);
+    if (plr != VK_SUCCESS) {
+        qWarning() << "VulkanPipeline: vkCreatePipelineLayout failed:" << plr;
+        return false;
+    }
 
     VkGraphicsPipelineCreateInfo pci = {};
     pci.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

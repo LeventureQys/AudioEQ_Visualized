@@ -1,0 +1,935 @@
+qt.highdpi: Initializing high-DPI scaling
+qt.highdpi: Initialization done, high-DPI scaling is active
+qt.qpa.plugin: init_platform called with pluginNamesWithArguments "windows" platformPluginPath "" platformThemeName ""
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/platforms" ...
+qt.core.plugin.factoryloader: looking at "qwindowsd.dll"
+qt.core.plugin.loader: Found metadata in lib D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/platforms/qwindowsd.dll, metadata=
+{
+    "IID": "org.qt-project.Qt.QPA.QPlatformIntegrationFactoryInterface.5.3",
+    "MetaData": {
+        "Keys": [
+            "windows"
+        ]
+    },
+    "archlevel": 0,
+    "className": "QWindowsIntegrationPlugin",
+    "debug": true,
+    "version": 395264
+}
+
+
+qt.core.plugin.factoryloader: Got keys from plugin meta data QList("windows")
+qt.qpa.plugin: Attempting to load Qt platform plugin "windows" with arguments QList()
+qt.core.library: "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/platforms/qwindowsd.dll" loaded library
+qt.qpa.window: QWindowsContext::setProcessDpiAwareness QtWindows::DpiAwareness::PerMonitorVersion2
+qt.qpa.window: DpiAwareness= QtWindows::DpiAwareness::PerMonitorVersion2 effective process DPI awareness= QtWindows::DpiAwareness::PerMonitorVersion2
+qt.qpa.window: QWindowsContext::registerWindowClass "Qt683dPowerDummyWindow" style=0x0 brush=0x0 icon=false atom=50236
+qt.qpa.window: QWindowsContext::registerWindowClass "Qt683dClipboardView" style=0x0 brush=0x0 icon=false atom=50239
+qt.qpa.mime: QWindowsClipboard::registerViewer m_clipboardViewer: 0xd0a58 format listener: true next: 0x0
+qt.qpa.screen: Initializing screen manager
+qt.qpa.window: QWindowsContext::registerWindowClass "Qt683dScreenChangeObserverWindow" style=0x0 brush=0x0 icon=false atom=50221
+qt.qpa.screen: Created display change observer 0x4d0b7e
+qt.highdpi: Updating high-DPI scaling
+qt.highdpi: Update done, high-DPI scaling is inactive
+qt.qpa.screen: New Monitor:  Screen "LECOO B2728-R" 1920x1080+0+0 avail: 1920x1032+0+0 physical: 598x336 DPI: 96x96 Depth: 32 Format: QImage::Format_RGB32 hMonitor: 0x10001 device name: \\.\DISPLAY1 manufacturer: Lectron Company Ltd model: LECOO B2728-R serial number: CS4LEGA1WP804 primary virtual desktop
+qt.qpa.plugin: Successfully loaded Qt platform plugin "windows"
+qt.qpa.theme: Adding platform integration's theme names to list of theme names: QList("windows")
+qt.qpa.theme: Attempting to create platform theme "windows" via QPlatformThemeFactory::create
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/platformthemes" ...
+qt.qpa.theme: Attempting to create platform theme "windows" via createPlatformTheme
+qt.qpa.window: QWindowsTheme::refreshFonts NONCLIENTMETRICS(iMenu=19x19, lfCaptionFont=LOGFONT("Microsoft YaHei UI", lfWidth=0, lfHeight=-12), lfSmCaptionFont=LOGFONT("Microsoft YaHei UI", lfWidth=0, lfHeight=-12), lfMenuFont=LOGFONT("Microsoft YaHei UI", lfWidth=0, lfHeight=-12), lfMessageFont=LOGFONT("Microsoft YaHei UI", lfWidth=0, lfHeight=-12), lfStatusFont=LOGFONT("Microsoft YaHei UI", lfWidth=0, lfHeight=-12))
+qt.qpa.fonts: QWindowsFontDatabaseBase::systemDefaultFont QFont(Microsoft YaHei UI,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1)
+qt.qpa.window: QWindowsTheme::refreshIconPixmapSizes QList(QSize(16, 16), QSize(32, 32), QSize(48, 48), QSize(256, 256))
+qt.qpa.theme: Successfully created platform theme "windows"
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/styles" ...
+qt.core.library: "vulkan-1" loaded library
+qt.vulkan: Vulkan init (vulkan-1.dll)
+qt.vulkan: Supported Vulkan instance layers: QList(QVulkanLayer("VK_LAYER_LUNARG_api_dump" 2 QVersionNumber(1.4.350) "LunarG API dump layer"), QVulkanLayer("VK_LAYER_LUNARG_gfxreconstruct" 4194309 QVersionNumber(1.4.350) "GFXReconstruct Capture Layer Version 1.0.5"), QVulkanLayer("VK_LAYER_KHRONOS_synchronization2" 1 QVersionNumber(1.4.350) "Khronos Synchronization2 layer"), QVulkanLayer("VK_LAYER_KHRONOS_validation" 1 QVersionNumber(1.4.350) "Khronos Validation Layer"), QVulkanLayer("VK_LAYER_LUNARG_monitor" 1 QVersionNumber(1.4.350) "Execution Monitoring Layer"), QVulkanLayer("VK_LAYER_LUNARG_screenshot" 1 QVersionNumber(1.4.350) "LunarG image capture layer"), QVulkanLayer("VK_LAYER_KHRONOS_profiles" 1 QVersionNumber(1.4.350) "Khronos Profiles layer"), QVulkanLayer("VK_LAYER_KHRONOS_shader_object" 1 QVersionNumber(1.4.350) "Khronos Shader object layer"), QVulkanLayer("VK_LAYER_LUNARG_crash_diagnostic" 1 QVersionNumber(1.4.350) "Crash Diagnostic Layer is a crash/hang debugging tool that helps determines GPU progress in a Vulkan application."))
+qt.vulkan: Supported Vulkan instance extensions: QList(QVulkanExtension("VK_KHR_surface" 25), QVulkanExtension("VK_KHR_win32_surface" 6), QVulkanExtension("VK_KHR_external_memory_capabilities" 1), QVulkanExtension("VK_KHR_external_semaphore_capabilities" 1), QVulkanExtension("VK_KHR_external_fence_capabilities" 1), QVulkanExtension("VK_KHR_get_physical_device_properties2" 2), QVulkanExtension("VK_KHR_get_surface_capabilities2" 1), QVulkanExtension("VK_KHR_device_group_creation" 1), QVulkanExtension("VK_EXT_swapchain_colorspace" 5), QVulkanExtension("VK_EXT_debug_utils" 2), QVulkanExtension("VK_EXT_debug_report" 10), QVulkanExtension("VK_KHR_portability_enumeration" 1), QVulkanExtension("VK_LUNARG_direct_driver_loading" 1))
+qt.vulkan: Enabling Vulkan instance layers: QList()
+qt.vulkan: Enabling Vulkan instance extensions: QList("VK_KHR_surface", "VK_KHR_portability_enumeration", "VK_EXT_debug_utils", "VK_KHR_win32_surface")
+qt.widgets.focus: Initializing focus chain of QWidget(0xbacaff3a8)
+qt.accessibility.cache: insert - id: 2147483648  iface: QAccessibleInterface(0x1b8dadd9460 name="" role=Window obj=QMainWindow(0xbacaff3a8)"invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad3bf30)
+AudioEQ::initializeComponents: starting
+qt.vulkan: Vulkan init (vulkan-1.dll)
+qt.vulkan: Supported Vulkan instance layers: QList(QVulkanLayer("VK_LAYER_LUNARG_api_dump" 2 QVersionNumber(1.4.350) "LunarG API dump layer"), QVulkanLayer("VK_LAYER_LUNARG_gfxreconstruct" 4194309 QVersionNumber(1.4.350) "GFXReconstruct Capture Layer Version 1.0.5"), QVulkanLayer("VK_LAYER_KHRONOS_synchronization2" 1 QVersionNumber(1.4.350) "Khronos Synchronization2 layer"), QVulkanLayer("VK_LAYER_KHRONOS_validation" 1 QVersionNumber(1.4.350) "Khronos Validation Layer"), QVulkanLayer("VK_LAYER_LUNARG_monitor" 1 QVersionNumber(1.4.350) "Execution Monitoring Layer"), QVulkanLayer("VK_LAYER_LUNARG_screenshot" 1 QVersionNumber(1.4.350) "LunarG image capture layer"), QVulkanLayer("VK_LAYER_KHRONOS_profiles" 1 QVersionNumber(1.4.350) "Khronos Profiles layer"), QVulkanLayer("VK_LAYER_KHRONOS_shader_object" 1 QVersionNumber(1.4.350) "Khronos Shader object layer"), QVulkanLayer("VK_LAYER_LUNARG_crash_diagnostic" 1 QVersionNumber(1.4.350) "Crash Diagnostic Layer is a crash/hang debugging tool that helps determines GPU progress in a Vulkan application."))
+qt.vulkan: Supported Vulkan instance extensions: QList(QVulkanExtension("VK_KHR_surface" 25), QVulkanExtension("VK_KHR_win32_surface" 6), QVulkanExtension("VK_KHR_external_memory_capabilities" 1), QVulkanExtension("VK_KHR_external_semaphore_capabilities" 1), QVulkanExtension("VK_KHR_external_fence_capabilities" 1), QVulkanExtension("VK_KHR_get_physical_device_properties2" 2), QVulkanExtension("VK_KHR_get_surface_capabilities2" 1), QVulkanExtension("VK_KHR_device_group_creation" 1), QVulkanExtension("VK_EXT_swapchain_colorspace" 5), QVulkanExtension("VK_EXT_debug_utils" 2), QVulkanExtension("VK_EXT_debug_report" 10), QVulkanExtension("VK_KHR_portability_enumeration" 1), QVulkanExtension("VK_LUNARG_direct_driver_loading" 1))
+qt.vulkan: Enabling Vulkan instance layers: QList("VK_LAYER_KHRONOS_validation")
+qt.vulkan: Enabling Vulkan instance extensions: QList("VK_KHR_surface", "VK_KHR_portability_enumeration", "VK_EXT_debug_utils", "VK_KHR_win32_surface")
+VulkanContext: Using physical device: Intel(R) UHD Graphics 770
+VulkanContext: Initialization complete
+AudioEQ::initializeComponents: VulkanContext initialized
+AudioEQ::initializeComponents: EqualizerModel created
+AudioEQ::initializeComponents: VulkanRenderer created
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad855b0)
+AudioEQ::initializeComponents: calling setRenderer...
+ViewEqualizer::createVulkanWindow: creating VulkanQtWindow...
+qt.qpa.window: QWindowsContext::registerWindowClass "Qt683dQWindowIcon" style=0x8 brush=0x0 icon=true atom=50227
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x86cf0000 exStyle=0x0 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowCreationContext::QWindowCreationContext VulkanQtWindow(0x1b8dcf59070) QRect(880,436 160x160) pos incl. frame=false frame=176x199+872+405 margins=QMargins(8, 31, 8, 8) custom margins=QMargins(0, 0, 0, 0)
+qt.qpa.window: CreateWindowEx: VulkanQtWindow(0x1b8dcf59070) class="Qt683dQWindowIcon" title="SimpleDemo"
+WindowCreationData: QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+  topLevel=true popup=false dialog=false embedded=false tool=false
+  style=0x86cf0000 WS_POPUP WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_THICKFRAME WS_DLGFRAME WS_SYSMENU WS_MINIMIZEBOX WS_MAXIMIZEBOX WS_BORDER WS_CAPTION WS_GROUP WS_SIZEBOX WS_TABSTOP
+requested: QRect(880,436 160x160): 176x199+872+405 custom margins: QMargins(0, 0, 0, 0) invisible margins: QMargins(0, 0, 0, 0)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=0,0 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: CreateWindowEx: returns VulkanQtWindow(0x1b8dcf59070) 0x130a3e obtained geometry: QPoint(880,436)QSize(160, 160) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowsIntegration::createPlatformWindow VulkanQtWindow(0x1b8dcf59070)
+    Requested: QRect(0,0 0x0) frame incl.=false QFlags<Qt::WindowType>(Window)
+    Obtained : QRect(880,436 160x160) margins=QMargins(8, 31, 8, 8) handle=0x130a3e QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+
+qt.qpa.mime: QWindowsWindow::setDropSiteEnabled VulkanQtWindow(0x1b8dcf59070) true
+qt.qpa.mime: QWindowsOleDropTarget::QWindowsOleDropTarget 0x1b8dcf58f70 VulkanQtWindow(0x1b8dcf59070)
+qt.qpa.window: qWindowsWndProc WM_NCCALCSIZE for 0x130a3e QMargins(8, 31, 8, 8)
+ViewEqualizer::createVulkanWindow: VulkanQtWindow created, creating container...
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dadd5b50)
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x86cf0000 exStyle=0x0 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowCreationContext::QWindowCreationContext QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") QRect(880,436 160x160) pos incl. frame=false frame=176x199+872+405 margins=QMargins(8, 31, 8, 8) custom margins=QMargins(0, 0, 0, 0)
+qt.qpa.window: CreateWindowEx: QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") class="Qt683dQWindowIcon" title="SimpleDemo"
+WindowCreationData: QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+  topLevel=true popup=false dialog=false embedded=false tool=false
+  style=0x86cf0000 WS_POPUP WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_THICKFRAME WS_DLGFRAME WS_SYSMENU WS_MINIMIZEBOX WS_MAXIMIZEBOX WS_BORDER WS_CAPTION WS_GROUP WS_SIZEBOX WS_TABSTOP
+requested: QRect(880,436 160x160): 176x199+872+405 custom margins: QMargins(0, 0, 0, 0) invisible margins: QMargins(0, 0, 0, 0)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=0,0 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: CreateWindowEx: returns QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") 0x130760 obtained geometry: QPoint(880,436)QSize(160, 160) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowsIntegration::createPlatformWindow QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent")
+    Requested: QRect(0,0 0x0) frame incl.=false QFlags<Qt::WindowType>(Window)
+    Obtained : QRect(880,436 160x160) margins=QMargins(8, 31, 8, 8) handle=0x130760 QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+
+qt.qpa.mime: QWindowsWindow::setDropSiteEnabled QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") true
+qt.qpa.mime: QWindowsOleDropTarget::QWindowsOleDropTarget 0x1b8dcf59df0 QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent")
+qt.qpa.window: qWindowsWndProc WM_NCCALCSIZE for 0x130760 QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowsWindow::setParent VulkanQtWindow(0x1b8dcf59070) QPlatformSurface(0x1b8dd65db50, class=QSurface::Window, type=QSurface::RasterSurface, window=QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent"))
+qt.qpa.window: qWindowsWndProc WM_NCCALCSIZE for 0x130a3e QMargins(8, 31, 8, 8)
+qt.qpa.mime: QWindowsWindow::setDropSiteEnabled VulkanQtWindow(0x1b8dcf59070) false
+qt.qpa.mime: QWindowsOleDropTarget::~QWindowsOleDropTarget 0x1b8dcf58f70
+qt.qpa.window: WindowCreationData::applyWindowFlags0x130a3eWindowCreationData: QFlags<Qt::WindowType>(Window)
+  topLevel=false parent=0x130760 popup=false dialog=false embedded=false tool=false
+  style=0x46000000 WS_CHILD WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_CHILDWINDOW
+    Style from "0x86cf0000 WS_POPUP WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_THICKFRAME WS_DLGFRAME WS_SYSMENU WS_MINIMIZEBOX WS_MAXIMIZEBOX WS_BORDER WS_CAPTION WS_GROUP WS_SIZEBOX WS_TABSTOP"
+    to "0x46000000 WS_CHILD WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_CHILDWINDOW"
+    ExStyle from "0x100 WS_EX_WINDOWEDGE" to "0x0"
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) QRect(880,436 160x160)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) QRect(880,436 160x160)
+qt.qpa.window: QWindowsWindow::setParent VulkanQtWindow(0x1b8dcf59070) QPlatformSurface(0x1b8dd65db50, class=QSurface::Window, type=QSurface::RasterSurface, window=QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent"))
+qt.qpa.window: > QWindowsWindow::setWindowFlags QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) 
+    from:  QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint) 
+    to:  QFlags<Qt::WindowType>(Window|SubWindow)
+qt.qpa.window: WindowCreationData::applyWindowFlags0x130a3eWindowCreationData: QFlags<Qt::WindowType>(Window|SubWindow)
+  topLevel=false parent=0x130760 popup=false dialog=false embedded=false tool=false
+  style=0x46000000 WS_CHILD WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_CHILDWINDOW
+    Style from "0x46000000 WS_CHILD WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_CHILDWINDOW"
+    to "0x46000000 WS_CHILD WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_CHILDWINDOW"
+    ExStyle from "0x0" to "0x0"
+qt.qpa.window: < QWindowsWindow::setWindowFlags 
+    returns:  QFlags<Qt::WindowType>(Window|SubWindow)  geometry  QRect(880,436 160x160) -> QRect(880,436 160x160)
+ViewEqualizer::createVulkanWindow: complete, m_initialized=true
+AudioEQ::initializeComponents: setRenderer done, calling setCoordinateMapper...
+AudioEQ::initializeComponents: ViewEqualizer fully set up
+AudioEQ::initializeComponents: calling setBandCount(5)...
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad695e0)
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad695e0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad695e0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad68820)
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Hiding children of LpfHandle(0x1b8dad68820) spontaneously false
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad69110)
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Hiding children of HpfHandle(0x1b8dad69110) spontaneously false
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad69480)
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad69480) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad69480) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad69690)
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad69690) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad69690) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dad67900)
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad67900) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dad67900) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8dacfdff0)
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dacfdff0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of BandHandle(0x1b8dacfdff0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+AudioEQ::initializeComponents: complete
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b11740)
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b10b00)
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/iconengines" ...
+qt.gui.icon.loader: Initialized icon loader with system theme "" and SVG support false
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/imageformats" ...
+qt.widgets.showhide: Setting visibility of QToolBarExtension(0x1b8e1b10b00, name="qt_toolbar_ext_button") with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QToolBarExtension(0x1b8e1b10b00, name="qt_toolbar_ext_button") with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Hiding children of QToolBarExtension(0x1b8e1b10b00, name="qt_toolbar_ext_button") spontaneously false
+qt.accessibility.cache: insert - id: 2147483649  iface: QAccessibleInterface(0x1b8e1b080d0 name="" role=ToolBar childc=1 obj=QToolBar(0x1b8e1b11740)"invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b116d0)
+qt.accessibility.cache: insert - id: 2147483650  iface: QAccessibleInterface(0x1b8e1b08190 name="44.1kHz" role=Button obj=QPushButton(0x1b8e1b116d0)"focusable|invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b11820)
+qt.accessibility.cache: insert - id: 2147483651  iface: QAccessibleInterface(0x1b8e1b0a050 name="48kHz" role=Button obj=QPushButton(0x1b8e1b11820)"focusable|invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b11890)
+qt.accessibility.cache: insert - id: 2147483652  iface: QAccessibleInterface(0x1b8e1b0a110 name="96kHz" role=Button obj=QPushButton(0x1b8e1b11890)"focusable|invisible")
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b116d0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b116d0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b116d0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11820) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11820) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11820) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11890) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11890) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11890) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1b10a20)
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1b10a20) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1b10a20) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Hiding children of QToolBarSeparator(0x1b8e1b10a20) spontaneously false
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be6330)
+qt.accessibility.cache: insert - id: 2147483653  iface: QAccessibleInterface(0x1b8e1b0a650 name="3 Bands" role=Button obj=QPushButton(0x1b8e1be6330)"focusable|invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be6c60)
+qt.accessibility.cache: insert - id: 2147483654  iface: QAccessibleInterface(0x1b8e1b097b0 name="5 Bands" role=Button obj=QPushButton(0x1b8e1be6c60)"focusable|invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be6b10)
+qt.accessibility.cache: insert - id: 2147483655  iface: QAccessibleInterface(0x1b8e1b09390 name="8 Bands" role=Button obj=QPushButton(0x1b8e1be6b10)"focusable|invisible")
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6330) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6330) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6330) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6c60) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6c60) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6c60) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6b10) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6b10) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6b10) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be6560)
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1be6560) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1be6560) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Hiding children of QToolBarSeparator(0x1b8e1be6560) spontaneously false
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be69c0)
+qt.accessibility.cache: insert - id: 2147483656  iface: QAccessibleInterface(0x1b8e1b0a7d0 name="LPF" role=Button obj=QPushButton(0x1b8e1be69c0)"focusable|invisible")
+qt.widgets.focus: Initializing focus chain of QWidget(0x1b8e1be6170)
+qt.accessibility.cache: insert - id: 2147483657  iface: QAccessibleInterface(0x1b8e1b09c30 name="HPF" role=Button obj=QPushButton(0x1b8e1be6170)"focusable|invisible")
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be69c0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be69c0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be69c0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6170) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6170) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6170) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of QMainWindow(0xbacaff3a8) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Hover,WA_QuitOnClose,WA_AcceptDrops,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QMainWindow(0xbacaff3a8) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_WState_ExplicitShowHide,WA_Hover,WA_QuitOnClose,WA_AcceptDrops,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.qpa.backingstore: Check for forced use of QRhi resulted in enable false with api Null
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x86cf0000 exStyle=0x0 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowCreationContext::QWindowCreationContext QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(510,266 900x500) pos incl. frame=false frame=916x539+502+235 margins=QMargins(8, 31, 8, 8) custom margins=QMargins(0, 0, 0, 0)
+qt.qpa.window: CreateWindowEx: QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") class="Qt683dQWindowIcon" title="SimpleDemo"
+WindowCreationData: QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+  topLevel=true popup=false dialog=false embedded=false tool=false
+  style=0x86cf0000 WS_POPUP WS_CLIPSIBLINGS WS_CLIPCHILDREN WS_THICKFRAME WS_DLGFRAME WS_SYSMENU WS_MINIMIZEBOX WS_MAXIMIZEBOX WS_BORDER WS_CAPTION WS_GROUP WS_SIZEBOX WS_TABSTOP
+requested: QRect(510,266 900x500): 916x539+502+235 custom margins: QMargins(0, 0, 0, 0) invisible margins: QMargins(0, 0, 0, 0)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=0,0 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: CreateWindowEx: returns QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") 0x11073a obtained geometry: QPoint(510,266)QSize(900, 500) QMargins(8, 31, 8, 8)
+qt.qpa.window: QWindowsIntegration::createPlatformWindow QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")
+    Requested: QRect(0,0 900x500) frame incl.=false QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint|WindowFullscreenButtonHint)
+    Obtained : QRect(510,266 900x500) margins=QMargins(8, 31, 8, 8) handle=0x11073a QFlags<Qt::WindowType>(Window|WindowTitleHint|WindowSystemMenuHint|WindowMinMaxButtonsHint|WindowCloseButtonHint)
+
+qt.qpa.mime: QWindowsWindow::setDropSiteEnabled QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") true
+qt.qpa.mime: QWindowsOleDropTarget::QWindowsOleDropTarget 0x1b8dcf59770 QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")
+qt.qpa.window: qWindowsWndProc WM_NCCALCSIZE for 0x11073a QMargins(8, 31, 8, 8)
+qt.qpa.backingstore: QWindowsBackingStore::QWindowsBackingStore 0x1b8e1b093f0 QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")
+qt.qpa.window: QWindowsBaseWindow::setWindowTitle_sys QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") "AudioEQ SimpleDemo"
+qt.qpa.window: QWindowsBaseWindow::setWindowTitle_sys QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") "AudioEQ SimpleDemo"
+qt.text.font.db: Populating font database
+qt.qpa.fonts: Trying to create IDWriteFactory6
+qt.qpa.fonts: QWindowsFontDatabase::QWindowsFontDatabase Clear type:  true gamma:  1.2
+qt.qpa.fonts: Creating DirectWrite database
+qt.qpa.fonts: QWindowsFontDatabaseBase::systemDefaultFont QFont(Microsoft YaHei UI,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1)
+qt.qpa.fonts: QWindowsFontDatabaseBase::systemDefaultFont QFont(Microsoft YaHei UI,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1)
+qt.qpa.fonts: Registering font, english name =  "Arial" , name in current locale =  ""
+qt.text.font.db: Registering family "Arial"
+qt.qpa.fonts: Registering font, english name =  "Bahnschrift" , name in current locale =  ""
+qt.text.font.db: Registering family "Bahnschrift"
+qt.qpa.fonts: Registering font, english name =  "Calibri" , name in current locale =  ""
+qt.text.font.db: Registering family "Calibri"
+qt.qpa.fonts: Registering font, english name =  "Cambria" , name in current locale =  ""
+qt.text.font.db: Registering family "Cambria"
+qt.qpa.fonts: Registering font, english name =  "Cambria Math" , name in current locale =  ""
+qt.text.font.db: Registering family "Cambria Math"
+qt.qpa.fonts: Registering font, english name =  "Candara" , name in current locale =  ""
+qt.text.font.db: Registering family "Candara"
+qt.qpa.fonts: Registering font, english name =  "Comic Sans MS" , name in current locale =  ""
+qt.text.font.db: Registering family "Comic Sans MS"
+qt.qpa.fonts: Registering font, english name =  "Consolas" , name in current locale =  ""
+qt.text.font.db: Registering family "Consolas"
+qt.qpa.fonts: Registering font, english name =  "Constantia" , name in current locale =  ""
+qt.text.font.db: Registering family "Constantia"
+qt.qpa.fonts: Registering font, english name =  "Corbel" , name in current locale =  ""
+qt.text.font.db: Registering family "Corbel"
+qt.qpa.fonts: Registering font, english name =  "Courier New" , name in current locale =  ""
+qt.text.font.db: Registering family "Courier New"
+qt.qpa.fonts: Registering font, english name =  "Ebrima" , name in current locale =  ""
+qt.text.font.db: Registering family "Ebrima"
+qt.qpa.fonts: Registering font, english name =  "Franklin Gothic" , name in current locale =  ""
+qt.text.font.db: Registering family "Franklin Gothic"
+qt.qpa.fonts: Registering font, english name =  "Gabriola" , name in current locale =  ""
+qt.text.font.db: Registering family "Gabriola"
+qt.qpa.fonts: Registering font, english name =  "Gadugi" , name in current locale =  ""
+qt.text.font.db: Registering family "Gadugi"
+qt.qpa.fonts: Registering font, english name =  "Georgia" , name in current locale =  ""
+qt.text.font.db: Registering family "Georgia"
+qt.qpa.fonts: Registering font, english name =  "Impact" , name in current locale =  ""
+qt.text.font.db: Registering family "Impact"
+qt.qpa.fonts: Registering font, english name =  "Ink Free" , name in current locale =  ""
+qt.text.font.db: Registering family "Ink Free"
+qt.qpa.fonts: Registering font, english name =  "Javanese Text" , name in current locale =  ""
+qt.text.font.db: Registering family "Javanese Text"
+qt.qpa.fonts: Registering font, english name =  "Leelawadee UI" , name in current locale =  ""
+qt.text.font.db: Registering family "Leelawadee UI"
+qt.qpa.fonts: Registering font, english name =  "Lucida Console" , name in current locale =  ""
+qt.text.font.db: Registering family "Lucida Console"
+qt.qpa.fonts: Registering font, english name =  "Lucida Sans Unicode" , name in current locale =  ""
+qt.text.font.db: Registering family "Lucida Sans Unicode"
+qt.qpa.fonts: Registering font, english name =  "Malgun Gothic" , name in current locale =  ""
+qt.text.font.db: Registering family "Malgun Gothic"
+qt.qpa.fonts: Registering font, english name =  "Microsoft Himalaya" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft Himalaya"
+qt.qpa.fonts: Registering font, english name =  "Microsoft JhengHei" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft JhengHei"
+qt.qpa.fonts: Registering font, english name =  "Microsoft JhengHei UI" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft JhengHei UI"
+qt.qpa.fonts: Registering font, english name =  "Microsoft New Tai Lue" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft New Tai Lue"
+qt.qpa.fonts: Registering font, english name =  "Microsoft PhagsPa" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft PhagsPa"
+qt.qpa.fonts: Registering font, english name =  "Microsoft Sans Serif" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft Sans Serif"
+qt.qpa.fonts: Registering font, english name =  "Microsoft Tai Le" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft Tai Le"
+qt.qpa.fonts: Registering font, english name =  "Microsoft YaHei" , name in current locale =  "微软雅黑"
+qt.text.font.db: Registering family "微软雅黑"
+qt.text.font.db: Registering family "Microsoft YaHei"
+qt.qpa.fonts: Registering font, english name =  "Microsoft YaHei UI" , name in current locale =  "Microsoft YaHei UI"
+qt.text.font.db: Registering family "Microsoft YaHei UI"
+qt.qpa.fonts: Registering font, english name =  "Microsoft Yi Baiti" , name in current locale =  ""
+qt.text.font.db: Registering family "Microsoft Yi Baiti"
+qt.qpa.fonts: Registering font, english name =  "MingLiU-ExtB" , name in current locale =  ""
+qt.text.font.db: Registering family "MingLiU-ExtB"
+qt.qpa.fonts: Registering font, english name =  "PMingLiU-ExtB" , name in current locale =  ""
+qt.text.font.db: Registering family "PMingLiU-ExtB"
+qt.qpa.fonts: Registering font, english name =  "MingLiU_HKSCS-ExtB" , name in current locale =  ""
+qt.text.font.db: Registering family "MingLiU_HKSCS-ExtB"
+qt.qpa.fonts: Registering font, english name =  "MingLiU_MSCS-ExtB" , name in current locale =  ""
+qt.text.font.db: Registering family "MingLiU_MSCS-ExtB"
+qt.qpa.fonts: Registering font, english name =  "Mongolian Baiti" , name in current locale =  ""
+qt.text.font.db: Registering family "Mongolian Baiti"
+qt.qpa.fonts: Registering font, english name =  "MS Gothic" , name in current locale =  ""
+qt.text.font.db: Registering family "MS Gothic"
+qt.qpa.fonts: Registering font, english name =  "MS UI Gothic" , name in current locale =  ""
+qt.text.font.db: Registering family "MS UI Gothic"
+qt.qpa.fonts: Registering font, english name =  "MS PGothic" , name in current locale =  ""
+qt.text.font.db: Registering family "MS PGothic"
+qt.qpa.fonts: Registering font, english name =  "MV Boli" , name in current locale =  ""
+qt.text.font.db: Registering family "MV Boli"
+qt.qpa.fonts: Registering font, english name =  "Myanmar Text" , name in current locale =  ""
+qt.text.font.db: Registering family "Myanmar Text"
+qt.qpa.fonts: Registering font, english name =  "Nirmala UI" , name in current locale =  ""
+qt.text.font.db: Registering family "Nirmala UI"
+qt.qpa.fonts: Registering font, english name =  "Nirmala Text" , name in current locale =  ""
+qt.text.font.db: Registering family "Nirmala Text"
+qt.qpa.fonts: Registering font, english name =  "Palatino Linotype" , name in current locale =  ""
+qt.text.font.db: Registering family "Palatino Linotype"
+qt.qpa.fonts: Registering font, english name =  "Sans Serif Collection" , name in current locale =  ""
+qt.text.font.db: Registering family "Sans Serif Collection"
+qt.qpa.fonts: Registering font, english name =  "Segoe Fluent Icons" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe Fluent Icons"
+qt.qpa.fonts: Registering font, english name =  "Segoe MDL2 Assets" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe MDL2 Assets"
+qt.qpa.fonts: Registering font, english name =  "Segoe Print" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe Print"
+qt.qpa.fonts: Registering font, english name =  "Segoe Script" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe Script"
+qt.qpa.fonts: Registering font, english name =  "Segoe UI" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe UI"
+qt.qpa.fonts: Registering font, english name =  "Segoe UI Emoji" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe UI Emoji"
+qt.qpa.fonts: Registering font, english name =  "Segoe UI Historic" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe UI Historic"
+qt.qpa.fonts: Registering font, english name =  "Segoe UI Symbol" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe UI Symbol"
+qt.qpa.fonts: Registering font, english name =  "Segoe UI Variable" , name in current locale =  ""
+qt.text.font.db: Registering family "Segoe UI Variable"
+qt.qpa.fonts: Registering font, english name =  "SimSun" , name in current locale =  "宋体"
+qt.text.font.db: Registering family "宋体"
+qt.text.font.db: Registering family "SimSun"
+qt.qpa.fonts: Registering font, english name =  "NSimSun" , name in current locale =  "新宋体"
+qt.text.font.db: Registering family "新宋体"
+qt.text.font.db: Registering family "NSimSun"
+qt.qpa.fonts: Registering font, english name =  "SimSun-ExtB" , name in current locale =  ""
+qt.text.font.db: Registering family "SimSun-ExtB"
+qt.qpa.fonts: Registering font, english name =  "Sitka" , name in current locale =  ""
+qt.text.font.db: Registering family "Sitka"
+qt.qpa.fonts: Registering font, english name =  "Sylfaen" , name in current locale =  ""
+qt.text.font.db: Registering family "Sylfaen"
+qt.qpa.fonts: Registering font, english name =  "Symbol" , name in current locale =  ""
+qt.text.font.db: Registering family "Symbol"
+qt.qpa.fonts: Registering font, english name =  "Tahoma" , name in current locale =  ""
+qt.text.font.db: Registering family "Tahoma"
+qt.qpa.fonts: Registering font, english name =  "Times New Roman" , name in current locale =  ""
+qt.text.font.db: Registering family "Times New Roman"
+qt.qpa.fonts: Registering font, english name =  "Trebuchet MS" , name in current locale =  ""
+qt.text.font.db: Registering family "Trebuchet MS"
+qt.qpa.fonts: Registering font, english name =  "Verdana" , name in current locale =  ""
+qt.text.font.db: Registering family "Verdana"
+qt.qpa.fonts: Registering font, english name =  "Webdings" , name in current locale =  ""
+qt.text.font.db: Registering family "Webdings"
+qt.qpa.fonts: Registering font, english name =  "Wingdings" , name in current locale =  ""
+qt.text.font.db: Registering family "Wingdings"
+qt.qpa.fonts: Registering font, english name =  "Yu Gothic" , name in current locale =  ""
+qt.text.font.db: Registering family "Yu Gothic"
+qt.qpa.fonts: Registering font, english name =  "Yu Gothic UI" , name in current locale =  ""
+qt.text.font.db: Registering family "Yu Gothic UI"
+qt.qpa.fonts: Registering font, english name =  "DengXian" , name in current locale =  "等线"
+qt.text.font.db: Registering family "等线"
+qt.text.font.db: Registering family "DengXian"
+qt.qpa.fonts: Registering font, english name =  "FangSong" , name in current locale =  "仿宋"
+qt.text.font.db: Registering family "仿宋"
+qt.text.font.db: Registering family "FangSong"
+qt.qpa.fonts: Registering font, english name =  "KaiTi" , name in current locale =  "楷体"
+qt.text.font.db: Registering family "楷体"
+qt.text.font.db: Registering family "KaiTi"
+qt.qpa.fonts: Registering font, english name =  "SimHei" , name in current locale =  "黑体"
+qt.text.font.db: Registering family "黑体"
+qt.text.font.db: Registering family "SimHei"
+qt.qpa.fonts: Registering font, english name =  "Noto Sans SC" , name in current locale =  "Noto Sans SC"
+qt.text.font.db: Registering family "Noto Sans SC"
+qt.qpa.fonts: Registering font, english name =  "Noto Serif SC" , name in current locale =  "Noto Serif SC"
+qt.text.font.db: Registering family "Noto Serif SC"
+qt.qpa.fonts: Registering font, english name =  "SimSun-ExtG" , name in current locale =  ""
+qt.text.font.db: Registering family "SimSun-ExtG"
+qt.qpa.fonts: Registering font, english name =  "Cascadia Code" , name in current locale =  ""
+qt.text.font.db: Registering family "Cascadia Code"
+qt.qpa.fonts: Registering font, english name =  "Cascadia Mono" , name in current locale =  ""
+qt.text.font.db: Registering family "Cascadia Mono"
+qt.qpa.fonts: Registering font, english name =  "" , name in current locale =  "Kingsoft UE"
+qt.text.font.db: Registering family "Kingsoft UE"
+qt.qpa.fonts: Registering font, english name =  "DejaVu Math TeX Gyre" , name in current locale =  ""
+qt.text.font.db: Registering family "DejaVu Math TeX Gyre"
+qt.qpa.fonts: Registering font, english name =  "MT Extra" , name in current locale =  ""
+qt.text.font.db: Registering family "MT Extra"
+qt.qpa.fonts: Registering font, english name =  "HarmonyOS Sans SC" , name in current locale =  "HarmonyOS Sans SC"
+qt.text.font.db: Registering family "HarmonyOS Sans SC"
+qt.qpa.fonts: Registering font, english name =  "NanumGothic" , name in current locale =  ""
+qt.text.font.db: Registering family "NanumGothic"
+qt.qpa.fonts: Registering font, english name =  "Source Han Sans JP" , name in current locale =  ""
+qt.text.font.db: Registering family "Source Han Sans JP"
+qt.qpa.fonts: Registering font, english name =  "Marlett" , name in current locale =  ""
+qt.text.font.db: Registering family "Marlett"
+qt.text.font.db: Registering family "System"
+qt.text.font.db: Registering family "Terminal"
+qt.text.font.db: Registering family "Fixedsys"
+qt.text.font.db: Registering family "Modern"
+qt.text.font.db: Registering family "Roman"
+qt.text.font.db: Registering family "Script"
+qt.text.font.db: Registering family "Courier"
+qt.text.font.db: Registering family "MS Serif"
+qt.text.font.db: Registering family "MS Sans Serif"
+qt.text.font.db: Registering family "Small Fonts"
+qt.text.font.match: QFontDatabasePrivate::match
+  request:
+    family: Microsoft YaHei UI [-- any --], script: 2
+    styleName: -- any --
+    weight: 400, style: 0
+    stretch: 0
+    pixelSize: 12
+    pitch: *
+qt.qpa.fonts: Populate family: "Microsoft YaHei UI"
+qt.qpa.fonts: Family "Microsoft YaHei UI" has english variant "Regular" , in default locale: "Regular" QFont::Unstretched QFont::StyleNormal QFont::Normal false
+qt.qpa.fonts: Font "Microsoft YaHei UI" "Regular" supports writing systems: QSupportedWritingSystems(Latin, Greek, Cyrillic, SimplifiedChinese, Vietnamese)
+qt.text.font.db: Adding font: familyName "Microsoft YaHei UI" stylename "Regular" weight 400 style QFont::StyleNormal pixelSize 0 antialiased false fixed false
+qt.qpa.fonts: Family "Microsoft YaHei UI" has english variant "Light" , in default locale: "Light" QFont::Unstretched QFont::StyleNormal QFont::Weight(290) false
+qt.qpa.fonts: Font "Microsoft YaHei UI" "Light" supports writing systems: QSupportedWritingSystems(Latin, Greek, Cyrillic, SimplifiedChinese, Vietnamese)
+qt.text.font.db: Adding font: familyName "Microsoft YaHei UI" stylename "Light" weight 290 style QFont::StyleNormal pixelSize 0 antialiased false fixed false
+qt.qpa.fonts: Family "Microsoft YaHei UI" has english variant "Bold" , in default locale: "Bold" QFont::Unstretched QFont::StyleNormal QFont::Bold false
+qt.qpa.fonts: Font "Microsoft YaHei UI" "Bold" supports writing systems: QSupportedWritingSystems(Latin, Greek, Cyrillic, SimplifiedChinese, Vietnamese)
+qt.text.font.db: Adding font: familyName "Microsoft YaHei UI" stylename "Bold" weight 700 style QFont::StyleNormal pixelSize 0 antialiased false fixed false
+qt.text.font.match:   REMARK: looking for best foundry for family 'Microsoft YaHei UI' [1]
+qt.text.font.match:           looking for matching style in foundry '-- none --' 3
+qt.text.font.match:           best style has distance 0x0
+qt.text.font.match:           found smoothly scalable font (12 pixels)
+qt.text.font.match:           found a match: score 0 best score so far ffffffff
+qt.qpa.fonts: QWindowsFontEngineDirectWrite::QWindowsFontEngineDirectWrite 12
+qt.qpa.window: QWindowsWindow::propagateSizeHints QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")
+qt.widgets.showhide: Showing children of QMainWindow(0xbacaff3a8) spontaneously false
+qt.widgets.showhide: Considering AudioEQ(0x1b8dad3bf30) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Setting visibility of AudioEQ(0x1b8dad3bf30) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of AudioEQ(0x1b8dad3bf30) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Showing children of AudioEQ(0x1b8dad3bf30) spontaneously false
+qt.widgets.showhide: Considering ViewEqualizer(0x1b8dad855b0) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Setting visibility of ViewEqualizer(0x1b8dad855b0) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of ViewEqualizer(0x1b8dad855b0) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Setting visibility of HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to false via QWidget
+qt.widgets.showhide: Showing children of ViewEqualizer(0x1b8dad855b0) spontaneously false
+qt.widgets.showhide: Considering QWindowContainer(0x1b8dadd5b50) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_AcceptDrops,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Setting visibility of QWindowContainer(0x1b8dadd5b50) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_AcceptDrops,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QWindowContainer(0x1b8dadd5b50) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_QuitOnClose,WA_AcceptDrops,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.qpa.window: > QWindowsBaseWindow::setGeometry_sys VulkanQtWindow(0x1b8dcf59070) 
+ from  QRect(880,436 160x160)  frame:  QMargins(8, 31, 8, 8)  to  QRect(0,29 900x471)  new frame:  QRect(-8,-2 916x510)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) QRect(0,29 900x471)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) QRect(0,29 900x471)
+qt.qpa.window: < QWindowsBaseWindow::setGeometry_sys VulkanQtWindow(0x1b8dcf59070) 
+ resulting  true QRect(0,29 900x471)
+qt.widgets.showhide: Showing children of QWindowContainer(0x1b8dadd5b50) spontaneously false
+qt.qpa.window: QWindowsWindow::setParent VulkanQtWindow(0x1b8dcf59070) QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow"))
+qt.qpa.window: QWindowsWindow::destroyWindow QPlatformSurface(0x1b8dd65db50, class=QSurface::Window, type=QSurface::RasterSurface, window=QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent")) QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") 0x130760
+qt.qpa.mime: QWindowsWindow::setDropSiteEnabled QWindow(0x1b8e1b635b0, name="VulkanQtWindowContainerFakeParent") false
+qt.qpa.mime: QWindowsOleDropTarget::~QWindowsOleDropTarget 0x1b8dcf59df0
+qt.qpa.window: QWindowsWindow::setVisible QPlatformSurface(0x1b8dd65cb10, class=QSurface::Window, type=QSurface::VulkanSurface, window=VulkanQtWindow(0x1b8dcf59070)) VulkanQtWindow(0x1b8dcf59070) 0x130a3e true
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/accessible" ...
+qt.accessibility.cache: insert - id: 2147483658  iface: QAccessibleInterface(0x1b8e1b0b0d0 name="" role=Client obj=QWindowContainer(0x1b8dadd5b50)rect=QRect(510,295 900x471))
+qt.widgets.showhide: Considering BandHandle(0x1b8dad695e0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of BandHandle(0x1b8dad695e0) spontaneously false
+qt.accessibility.cache: insert - id: 2147483659  iface: QAccessibleInterface(0x1b8e1b05250 name="" role=Client obj=BandHandle(0x1b8dad695e0)rect=QRect(490,511 40x40))
+qt.widgets.showhide: Considering LpfHandle(0x1b8dad68820) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Considering HpfHandle(0x1b8dad69110) with attributes [WA_NoSystemBackground,WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Considering BandHandle(0x1b8dad69480) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of BandHandle(0x1b8dad69480) spontaneously false
+qt.accessibility.cache: insert - id: 2147483660  iface: QAccessibleInterface(0x1b8e1b05310 name="" role=Client obj=BandHandle(0x1b8dad69480)rect=QRect(712,511 40x40))
+qt.widgets.showhide: Considering BandHandle(0x1b8dad69690) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of BandHandle(0x1b8dad69690) spontaneously false
+qt.accessibility.cache: insert - id: 2147483661  iface: QAccessibleInterface(0x1b8e1b056d0 name="" role=Client obj=BandHandle(0x1b8dad69690)rect=QRect(934,511 40x40))
+qt.widgets.showhide: Considering BandHandle(0x1b8dad67900) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of BandHandle(0x1b8dad67900) spontaneously false
+qt.accessibility.cache: insert - id: 2147483662  iface: QAccessibleInterface(0x1b8e1b058b0 name="" role=Client obj=BandHandle(0x1b8dad67900)rect=QRect(1156,511 40x40))
+qt.widgets.showhide: Considering BandHandle(0x1b8dacfdff0) with attributes [WA_NoSystemBackground,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of BandHandle(0x1b8dacfdff0) spontaneously false
+qt.accessibility.cache: insert - id: 2147483663  iface: QAccessibleInterface(0x1b8e1b05430 name="" role=Client obj=BandHandle(0x1b8dacfdff0)rect=QRect(1377,511 40x40))
+qt.accessibility.cache: insert - id: 2147483664  iface: QAccessibleInterface(0x1b8e1b053d0 name="" role=Client childc=8 obj=ViewEqualizer(0x1b8dad855b0)rect=QRect(510,295 900x471))
+qt.accessibility.cache: insert - id: 2147483665  iface: QAccessibleInterface(0x1b8e1b05a90 name="" role=Client childc=1 obj=AudioEQ(0x1b8dad3bf30)rect=QRect(510,295 900x471))
+qt.widgets.showhide: Considering QToolBar(0x1b8e1b11740) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_Hover,WA_QuitOnClose,WA_X11NetWmWindowTypeToolBar,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Setting visibility of QToolBar(0x1b8e1b11740) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_Hover,WA_QuitOnClose,WA_X11NetWmWindowTypeToolBar,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QToolBar(0x1b8e1b11740) with attributes [WA_LaidOut,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_Hover,WA_QuitOnClose,WA_X11NetWmWindowTypeToolBar,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b116d0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b116d0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11820) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11820) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11890) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1b11890) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1b10a20) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1b10a20) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6330) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6330) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6c60) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6c60) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6b10) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6b10) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1be6560) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QToolBarSeparator(0x1b8e1be6560) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be69c0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be69c0) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6170) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidget
+qt.widgets.showhide: Setting visibility of QPushButton(0x1b8e1be6170) with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea] to true via QWidgetPrivate
+qt.widgets.showhide: Showing children of QToolBar(0x1b8e1b11740) spontaneously false
+qt.widgets.showhide: Considering QToolBarExtension(0x1b8e1b10b00, name="qt_toolbar_ext_button") with attributes [WA_WState_Hidden,WA_PendingMoveEvent,WA_PendingResizeEvent,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Considering QPushButton(0x1b8e1b116d0) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1b116d0) spontaneously false
+qt.widgets.showhide: Considering QPushButton(0x1b8e1b11820) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1b11820) spontaneously false
+qt.widgets.showhide: Considering QPushButton(0x1b8e1b11890) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1b11890) spontaneously false
+qt.widgets.showhide: Considering QToolBarSeparator(0x1b8e1b10a20) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QToolBarSeparator(0x1b8e1b10a20) spontaneously false
+qt.accessibility.cache: insert - id: 2147483666  iface: QAccessibleInterface(0x1b8e1b05850 name="" role=Client obj=QToolBarSeparator(0x1b8e1b10a20)rect=QRect(747,268 6x25))
+qt.widgets.showhide: Considering QPushButton(0x1b8e1be6330) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1be6330) spontaneously false
+qt.widgets.showhide: Considering QPushButton(0x1b8e1be6c60) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1be6c60) spontaneously false
+qt.widgets.showhide: Considering QPushButton(0x1b8e1be6b10) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1be6b10) spontaneously false
+qt.widgets.showhide: Considering QToolBarSeparator(0x1b8e1be6560) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_OwnSizePolicy,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QToolBarSeparator(0x1b8e1be6560) spontaneously false
+qt.accessibility.cache: insert - id: 2147483667  iface: QAccessibleInterface(0x1b8e1b055b0 name="" role=Client obj=QToolBarSeparator(0x1b8e1be6560)rect=QRect(978,268 6x25))
+qt.widgets.showhide: Considering QPushButton(0x1b8e1be69c0) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1be69c0) spontaneously false
+qt.widgets.showhide: Considering QPushButton(0x1b8e1be6170) with attributes [WA_PendingMoveEvent,WA_PendingResizeEvent,WA_Resized,WA_Moved,WA_WState_Created,WA_WState_Polished,WA_WState_ExplicitShowHide,WA_QuitOnClose,WA_DropSiteRegistered,WA_MacShowFocusRect,WA_LayoutUsesWidgetRect,WA_ContentsMarginsRespectsSafeArea]
+qt.widgets.showhide: Showing children of QPushButton(0x1b8e1be6170) spontaneously false
+qt.qpa.window: QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QWindowsWindow::setCursor 0x10003  doApply= false
+qt.widgets.showhide: Setting visibility of QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") to true via QWidgetWindow::setNativeWindowVisibility
+qt.qpa.window: QWindowsWindow::setVisible QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") 0x11073a true
+qt.core.plugin.factoryloader: checking directory path "D:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/accessiblebridge" ...
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.accessibility.cache: insert - id: 2147483668  iface: QAccessibleInterface(0x1b8dcf48070 name="SimpleDemo" role=Application childc=1 obj=QApplication(0xbacaff378)rect=QRect(0,0 0x0))
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+VulkanQtWindow::exposeEvent: surface= valid size= QSize(900, 471)
+VulkanSwapchain: Created 2 images, 916 x 510
+VulkanPipeline: Created pipeline 0
+VulkanPipeline: Created pipeline 1
+VulkanPipeline: Created pipeline 2
+VulkanPipeline: Created pipeline 3
+VulkanFontAtlas: No embedded font data available
+VulkanRenderer: Font atlas init failed (non-fatal)
+VulkanRenderer: Initialized 900 x 471
+VulkanQtWindow::exposeEvent: renderer initialized, requesting update
+qt.qpa.input.devices: no mouse-like devices registered for seat "" The platform plugin should have provided one via QWindowSystemInterface::registerInputDevice(). Creating a default mouse for now.
+qt.qpa.events: Entering window  VulkanQtWindow(0x1b8dcf59070)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+VulkanRenderer::renderFrame: frame 0 gridVerts: 38 curvePoints: 500 gridDirty: true curveDirty: true gridVBO: true gridColor: QColor(ARGB 0.14902, 1, 1, 1) bgColor: QColor(ARGB 1, 0.101961, 0.101961, 0.101961)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+VulkanRenderer::renderFrame: frame 1 gridVerts: 38 curvePoints: 500 gridDirty: false curveDirty: false gridVBO: true gridColor: QColor(ARGB 0.14902, 1, 1, 1) bgColor: QColor(ARGB 1, 0.101961, 0.101961, 0.101961)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetEmbeddedFragmentRoots QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetFocus QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30020
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+VulkanRenderer::renderFrame: frame 2 gridVerts: 38 curvePoints: 500 gridDirty: false curveDirty: false gridVBO: true gridColor: QColor(ARGB 0.14902, 1, 1, 1) bgColor: QColor(ARGB 1, 0.101961, 0.101961, 0.101961)
+qt.pointer.velocity: velocity QVector2D(0, -62.5) filtered QVector2D(0, -43.75) based on movement QPointF(1107,627) -> QPointF(1107,626) over time 1992008062 -> 1992008078
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetEmbeddedFragmentRoots QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetEmbeddedFragmentRoots QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetFocus QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30020
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.pointer.velocity: velocity QVector2D(66.6667, -66.6667) filtered QVector2D(46.6667, -59.7917) based on movement QPointF(1107,625) -> QPointF(1108,624) over time 1992008078 -> 1992008093
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.pointer.velocity: velocity QVector2D(0, -62.5) filtered QVector2D(14, -61.6875) based on movement QPointF(1108,624) -> QPointF(1108,623) over time 1992008093 -> 1992008109
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetEmbeddedFragmentRoots QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e1c24320)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30008
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30008
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.pointer.velocity: velocity QVector2D(0, -9.47867) filtered QVector2D(4.2, -25.1413) based on movement QPointF(1108,623) -> QPointF(1108,619) over time 1992008109 -> 1992008531
+qt.pointer.velocity: velocity QVector2D(0, -733.333) filtered QVector2D(1.26, -520.876) based on movement QPointF(1108,619) -> QPointF(1108,608) over time 1992008531 -> 1992008546
+qt.pointer.velocity: velocity QVector2D(-187.5, -1062.5) filtered QVector2D(-130.872, -900.013) based on movement QPointF(1108,608) -> QPointF(1105,591) over time 1992008546 -> 1992008562
+qt.pointer.velocity: velocity QVector2D(-187.5, -812.5) filtered QVector2D(-170.512, -838.754) based on movement QPointF(1105,591) -> QPointF(1102,578) over time 1992008562 -> 1992008578
+qt.pointer.velocity: velocity QVector2D(-466.667, -1533.33) filtered QVector2D(-377.82, -1324.96) based on movement QPointF(1097,563) -> QPointF(1090,540) over time 1992008578 -> 1992008593
+qt.pointer.velocity: velocity QVector2D(-1375, -2625) filtered QVector2D(-1075.85, -2234.99) based on movement QPointF(1067,489) -> QPointF(1045,447) over time 1992008593 -> 1992008609
+qt.pointer.velocity: velocity QVector2D(-1062.5, -1812.5) filtered QVector2D(-1066.5, -1939.25) based on movement QPointF(1045,447) -> QPointF(1028,418) over time 1992008609 -> 1992008625
+qt.pointer.velocity: velocity QVector2D(-466.667, -866.667) filtered QVector2D(-646.618, -1188.44) based on movement QPointF(1028,418) -> QPointF(1021,405) over time 1992008625 -> 1992008640
+qt.pointer.velocity: velocity QVector2D(-687.5, -1250) filtered QVector2D(-675.235, -1231.53) based on movement QPointF(1015,394) -> QPointF(1004,374) over time 1992008640 -> 1992008656
+qt.pointer.velocity: velocity QVector2D(-200, -600) filtered QVector2D(-342.571, -789.46) based on movement QPointF(1004,374) -> QPointF(1001,365) over time 1992008656 -> 1992008671
+qt.pointer.velocity: velocity QVector2D(-31.25, -125) filtered QVector2D(-124.646, -324.338) based on movement QPointF(997,352) -> QPointF(996,348) over time 1992008671 -> 1992008703
+qt.pointer.velocity: velocity QVector2D(0, -200) filtered QVector2D(-37.3939, -237.301) based on movement QPointF(995,336) -> QPointF(995,333) over time 1992008703 -> 1992008718
+qt.pointer.velocity: velocity QVector2D(0, -187.5) filtered QVector2D(-11.2182, -202.44) based on movement QPointF(995,333) -> QPointF(995,330) over time 1992008718 -> 1992008734
+qt.pointer.velocity: velocity QVector2D(0, -562.5) filtered QVector2D(-3.36545, -454.482) based on movement QPointF(995,330) -> QPointF(995,321) over time 1992008734 -> 1992008750
+qt.pointer.velocity: velocity QVector2D(0, -533.333) filtered QVector2D(-1.00963, -509.678) based on movement QPointF(995,321) -> QPointF(995,313) over time 1992008750 -> 1992008765
+qt.pointer.velocity: velocity QVector2D(0, -750) filtered QVector2D(-0.30289, -677.903) based on movement QPointF(995,313) -> QPointF(995,301) over time 1992008765 -> 1992008781
+qt.pointer.velocity: velocity QVector2D(-66.6667, -733.333) filtered QVector2D(-46.7575, -716.704) based on movement QPointF(995,301) -> QPointF(994,290) over time 1992008781 -> 1992008796
+qt.pointer.velocity: velocity QVector2D(-62.5, -250) filtered QVector2D(-57.7773, -390.011) based on movement QPointF(994,290) -> QPointF(993,286) over time 1992008796 -> 1992008812
+qt.pointer.velocity: velocity QVector2D(-62.5, -187.5) filtered QVector2D(-61.0832, -248.253) based on movement QPointF(992,282) -> QPointF(991,279) over time 1992008812 -> 1992008828
+qt.pointer.velocity: velocity QVector2D(0, -9.17431) filtered QVector2D(-18.325, -80.898) based on movement QPointF(991,279) -> QPointF(991,278) over time 1992008828 -> 1992008937
+qt.pointer.velocity: velocity QVector2D(0, -96.7742) filtered QVector2D(-5.49749, -92.0114) based on movement QPointF(991,278) -> QPointF(991,275) over time 1992008937 -> 1992008968
+qt.pointer.velocity: velocity QVector2D(-62.5, -187.5) filtered QVector2D(-45.3992, -158.853) based on movement QPointF(991,275) -> QPointF(990,272) over time 1992008968 -> 1992008984
+qt.pointer.velocity: velocity QVector2D(-125, -187.5) filtered QVector2D(-101.12, -178.906) based on movement QPointF(990,272) -> QPointF(988,269) over time 1992008984 -> 1992009000
+qt.pointer.velocity: velocity QVector2D(0, -133.333) filtered QVector2D(-30.3359, -147.005) based on movement QPointF(988,269) -> QPointF(988,267) over time 1992009000 -> 1992009015
+qt.qpa.events: Leaving window  VulkanQtWindow(0x1b8dcf59070)
+qt.pointer.velocity: velocity QVector2D(-125, -187.5) filtered QVector2D(-96.6008, -175.352) based on movement QPointF(988,266) -> QPointF(986,263) over time 1992009015 -> 1992009031
+qt.pointer.velocity: velocity QVector2D(-66.6667, -200) filtered QVector2D(-75.6469, -192.605) based on movement QPointF(986,263) -> QPointF(985,260) over time 1992009031 -> 1992009046
+qt.pointer.velocity: velocity QVector2D(0, -62.5) filtered QVector2D(-22.6941, -101.532) based on movement QPointF(985,260) -> QPointF(985,259) over time 1992009046 -> 1992009062
+qt.pointer.velocity: velocity QVector2D(0, -62.5) filtered QVector2D(-6.80822, -74.2095) based on movement QPointF(985,259) -> QPointF(985,258) over time 1992009062 -> 1992009078
+qt.pointer.velocity: velocity QVector2D(-66.6667, -66.6667) filtered QVector2D(-48.7091, -68.9295) based on movement QPointF(985,258) -> QPointF(984,257) over time 1992009078 -> 1992009093
+qt.pointer.velocity: velocity QVector2D(-42.5532, -42.5532) filtered QVector2D(-44.4, -50.4661) based on movement QPointF(984,257) -> QPointF(982,255) over time 1992009093 -> 1992009140
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(503,266 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(477,267 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(462,269 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(443,273 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(419,278 900x500)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(396,281 900x500)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(373,284 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(350,286 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(328,288 900x500)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(303,288 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(275,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(226,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(204,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(182,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(166,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(151,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(138,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(126,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(115,289 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(97,287 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(84,284 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(81,284 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(79,283 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(78,283 900x500)
+qt.qpa.window: >QWindowsGeometryHint::applyToMinMaxInfo< min=117,68 max=16777215,16777215 margins=QMargins(8, 31, 8, 8) in MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=136, y=39))
+qt.qpa.window: <QWindowsGeometryHint::applyToMinMaxInfo out MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsWindow::getSizeHints QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") MINMAXINFO(maxSize=POINT(x=1936, y=1096), maxpos=POINT(x=-8, y=-8), maxtrack=POINT(x=1940, y=1100), mintrack=POINT(x=117, y=68))
+qt.qpa.window: QWindowsGeometryHint::frameOnPrimaryScreen style=0x96cf0000 exStyle=0x100 RECT(left=-8, top=-31, right=8, bottom=8 (16x39)) QMargins(8, 31, 8, 8)
+qt.qpa.events: QWindowsWindow::handleGeometryChange QPlatformSurface(0x1b8dd65d3d0, class=QSurface::Window, type=QSurface::RasterSurface, window=QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow")) QWidgetWindow(0x1b8e1be3f00, name="QMainWindowClassWindow") QRect(77,282 900x500)
+qt.pointer.velocity: velocity QVector2D(0, 0) filtered QVector2D(-13.32, -15.1398) based on movement QPointF(548,271) -> QPointF(548,271) over time 1992009140 -> 1992009421
+qt.pointer.velocity: velocity QVector2D(0, -15.873) filtered QVector2D(-3.996, -15.6531) based on movement QPointF(548,271) -> QPointF(548,270) over time 1992009421 -> 1992009484
+qt.pointer.velocity: velocity QVector2D(62.5, 0) filtered QVector2D(42.5512, -4.69592) based on movement QPointF(548,270) -> QPointF(549,270) over time 1992009484 -> 1992009500
+qt.pointer.velocity: velocity QVector2D(400, -133.333) filtered QVector2D(292.765, -94.7421) based on movement QPointF(549,270) -> QPointF(555,268) over time 1992009500 -> 1992009515
+qt.pointer.velocity: velocity QVector2D(562.5, 0) filtered QVector2D(481.58, -28.4226) based on movement QPointF(555,268) -> QPointF(564,268) over time 1992009515 -> 1992009531
+qt.pointer.velocity: velocity QVector2D(2533.33, 333.333) filtered QVector2D(1917.81, 224.807) based on movement QPointF(576,268) -> QPointF(614,273) over time 1992009531 -> 1992009546
+qt.qpa.events: Entering window  VulkanQtWindow(0x1b8dcf59070)
+qt.pointer.velocity: velocity QVector2D(3843.75, 812.5) filtered QVector2D(2690.63, 568.75) based on movement QPointF(614,273) -> QPointF(737,299) over time 1992009546 -> 1992009578
+qt.qpa.events: Leaving window  VulkanQtWindow(0x1b8dcf59070)
+qt.pointer.velocity: velocity QVector2D(4129.03, 806.452) filtered QVector2D(3697.51, 735.141) based on movement QPointF(851,321) -> QPointF(979,346) over time 1992009578 -> 1992009609
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30020
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30020
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetRuntimeId QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_HostRawElementProvider QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15080)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::GetPropertyValue 30016
+qt.qpa.uiautomation: QWindowsUiaMainProvider::get_FragmentRoot QWindowsUiaMainProvider(0x1b8e9a15800)
+qt.qpa.uiautomation: QWindowsUiaMainProvider::Navigate 0  this:  QWindowsUiaMainProvider(0x1b8e9a15800)

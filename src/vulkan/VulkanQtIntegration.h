@@ -15,6 +15,7 @@ public:
 
     VkSurfaceKHR vkSurface() const;
     void requestRender();
+    void shutdown();
 
 protected:
     void exposeEvent(QExposeEvent* e) override;

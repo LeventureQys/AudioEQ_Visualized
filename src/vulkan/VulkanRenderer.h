@@ -59,22 +59,36 @@ public:
     void renderFrame();
 
 private:
-    struct UBOData {
-        float projMatrix[16];
+    struct GridUBO {
+        float color[4];
+        float alpha;
+        float _pad0, _pad1, _pad2;
+    };
+    struct CurveUBO {
+        float color[4];
+        float lineWidth;
+        float _pad0, _pad1, _pad2;
+    };
+    struct FillUBO {
+        float color[4];
+    };
+    struct GlyphUBO {
+        float color[4];
     };
 
     QVector<float> buildCurveVBO(const QVector<QPointF>& points, float lineWidthPx);
     QVector<float> buildGridVBO(int* outVertexCount);
-    QVector<float> buildGlyphVBO(float x, float y, const QString& text);
+    QVector<float> buildAxisVBO();
     QVector<float> buildCircleVBO(float cx, float cy, float radius, int segments);
     QVector<float> buildEllipseVBO(float cx, float cy, float rx, float ry, int segments);
     QVector<float> buildFillVBO(const QVector<QPointF>& curvePoints);
+    void buildTextGeometry();
     void recordCommandBuffer(VkCommandBuffer cmd, uint32_t imageIndex);
     float toNdcX(float pixelX) const;
     float toNdcY(float pixelY) const;
     bool createDescriptorPool();
     bool allocateDescriptorSets();
-    void updateUBO(int frameIdx, const QColor& color);
+    void updateUBO(int frameIdx);
     void ensureTotalCurveVBO(size_t floatCount);
     void ensureBandCurveVBO(int index, size_t floatCount);
 
@@ -94,8 +108,12 @@ private:
 
     BufferAllocation m_gridVBO;
     int              m_gridVertexCount = 0;
+    BufferAllocation m_axisVBO;
+    uint32_t         m_axisVertexCount = 0;
     BufferAllocation m_totalCurveVBO;
     QMap<int, BufferAllocation> m_bandCurveVBOs;
+    BufferAllocation m_textVBO;
+    uint32_t         m_textVertexCount = 0;
 
     BufferAllocation m_gridUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
     BufferAllocation m_curveUBO[VulkanFrameSync::MAX_FRAMES_IN_FLIGHT];
@@ -115,10 +133,18 @@ private:
     QColor m_backgroundColor = QColor(26, 26, 26);
     QColor m_gridColor       = QColor(255, 255, 255, 38);
     QColor m_gridZeroColor   = QColor(255, 255, 255, 64);
+    QColor m_fillColor       = QColor(0, 255, 0, 64);
+    QColor m_glyphColor      = QColor(255, 255, 255, 255);
+
+    static constexpr float MARGIN_LEFT   = 40.0f;
+    static constexpr float MARGIN_RIGHT  = 10.0f;
+    static constexpr float MARGIN_TOP    = 10.0f;
+    static constexpr float MARGIN_BOTTOM = 25.0f;
 
     VkSurfaceKHR m_surface = VK_NULL_HANDLE;
     QSize        m_size;
     bool         m_initialized = false;
     bool         m_gridDirty   = true;
     bool         m_curveDirty  = true;
+    bool         m_textDirty   = true;
 };

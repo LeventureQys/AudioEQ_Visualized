@@ -68,3 +68,15 @@ set(EMBEDDED_SHADERS_SRC ${CMAKE_CURRENT_BINARY_DIR}/EmbeddedShaders.h ${CMAKE_C
 
 target_sources(AudioEQ PRIVATE ${EMBEDDED_SHADERS_SRC})
 target_include_directories(AudioEQ PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+# ── Embed font ─────────────────────────────────
+include(EmbedFont)
+set(FONT_FILE ${CMAKE_SOURCE_DIR}/thirdparty/font/Noto_Sans/static/NotoSans-Regular.ttf)
+embed_font(
+    ${CMAKE_CURRENT_BINARY_DIR}/EmbeddedFont.h
+    ${CMAKE_CURRENT_BINARY_DIR}/EmbeddedFont.cpp
+    ${FONT_FILE}
+    noto_sans_regular
+)
+set(EMBEDDED_FONT_SRC ${CMAKE_CURRENT_BINARY_DIR}/EmbeddedFont.h ${CMAKE_CURRENT_BINARY_DIR}/EmbeddedFont.cpp)
+target_sources(AudioEQ PRIVATE ${EMBEDDED_FONT_SRC})

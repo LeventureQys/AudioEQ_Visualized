@@ -19,20 +19,41 @@ AudioEQ::AudioEQ(QWidget* parent) : QWidget(parent) {
 }
 
 AudioEQ::~AudioEQ() {
+    if (m_ctx && m_ctx->device() != VK_NULL_HANDLE) {
+        vkDeviceWaitIdle(m_ctx->device());
+    }
+
     delete m_engine;
-    delete m_view;
-    delete m_renderer;
+    m_engine = nullptr;
+
+    if (m_view) {
+        delete m_view;
+        m_view = nullptr;
+    }
+
+    if (m_renderer) {
+        m_renderer->destroy();
+        delete m_renderer;
+        m_renderer = nullptr;
+    }
+
     delete m_ctx;
+    m_ctx = nullptr;
+    delete m_mapper;
+    m_mapper = nullptr;
 }
 
 void AudioEQ::initializeComponents() {
+    qDebug() << "AudioEQ::initializeComponents: starting";
     m_ctx = new VulkanContext();
     if (!m_ctx->initialize()) {
         qWarning("AudioEQ: Vulkan not available");
         return;
     }
+    qDebug() << "AudioEQ::initializeComponents: VulkanContext initialized";
 
     m_model = new EqualizerModel(this);
+    qDebug() << "AudioEQ::initializeComponents: EqualizerModel created";
 
     m_mapper = new CoordinateMapper();
     m_mapper->setSampleRate(m_model->sampleRate());
@@ -40,12 +61,17 @@ void AudioEQ::initializeComponents() {
     m_engine = new CurveEngine();
 
     m_renderer = new VulkanRenderer(m_ctx, this);
+    m_renderer->setCoordinateMapper(m_mapper);
+    qDebug() << "AudioEQ::initializeComponents: VulkanRenderer created";
 
     m_view = new ViewEqualizer(this);
     m_view->setVulkanContext(m_ctx);
+    qDebug() << "AudioEQ::initializeComponents: calling setRenderer...";
     m_view->setRenderer(m_renderer);
+    qDebug() << "AudioEQ::initializeComponents: setRenderer done, calling setCoordinateMapper...";
     m_view->setCoordinateMapper(m_mapper);
     m_view->setModel(m_model);
+    qDebug() << "AudioEQ::initializeComponents: ViewEqualizer fully set up";
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -69,8 +95,16 @@ void AudioEQ::initializeComponents() {
     connect(m_engine, &CurveEngine::totalCurveReady, this, &AudioEQ::onTotalCurveReady);
     connect(m_engine, &CurveEngine::bandCurveReady, this, &AudioEQ::onBandCurveReady);
 
+    if (m_mapper && m_view) {
+        m_mapper->setViewport(QRectF(ViewEqualizer::MARGIN_LEFT, ViewEqualizer::MARGIN_TOP,
+                                      800 - ViewEqualizer::MARGIN_LEFT - ViewEqualizer::MARGIN_RIGHT,
+                                      500 - ViewEqualizer::MARGIN_TOP - ViewEqualizer::MARGIN_BOTTOM));
+    }
+
     m_initialized = true;
+    qDebug() << "AudioEQ::initializeComponents: calling setBandCount(5)...";
     setBandCount(5);
+    qDebug() << "AudioEQ::initializeComponents: complete";
 }
 
 int AudioEQ::bandCount() const {

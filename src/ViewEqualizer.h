@@ -42,6 +42,11 @@ public:
 
     static constexpr int HANDLE_RADIUS = 20;
 
+    static constexpr float MARGIN_LEFT   = 40.0f;
+    static constexpr float MARGIN_RIGHT  = 10.0f;
+    static constexpr float MARGIN_TOP    = 10.0f;
+    static constexpr float MARGIN_BOTTOM = 25.0f;
+
 signals:
     void bandDragged(int index, double deltaX, double deltaY);
     void bandClicked(int index);
@@ -51,6 +56,7 @@ signals:
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    void setVisible(bool visible) override;
 
 private slots:
     void onBandChanged(int index);

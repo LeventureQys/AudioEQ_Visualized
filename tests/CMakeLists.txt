@@ -23,3 +23,16 @@ endfunction()
 add_audioeq_test(TestButterworthIIR TestButterworthIIR.cpp)
 add_audioeq_test(TestCoordinateMapper TestCoordinateMapper.cpp)
 add_audioeq_test(TestCurveEngine TestCurveEngine.cpp)
+
+# Standalone Vulkan pipeline test (no gtest, console app)
+add_executable(test_vulkan_pipeline test_vulkan_pipeline.cpp)
+target_link_libraries(test_vulkan_pipeline PRIVATE AudioEQ Qt6::Core)
+if(WIN32)
+    target_compile_definitions(test_vulkan_pipeline PRIVATE AUDIOEQ_EXPORT=__declspec\(dllimport\))
+    add_custom_command(TARGET test_vulkan_pipeline POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:test_vulkan_pipeline>
+            $<TARGET_FILE_DIR:test_vulkan_pipeline>
+        COMMAND_EXPAND_LISTS
+    )
+endif()

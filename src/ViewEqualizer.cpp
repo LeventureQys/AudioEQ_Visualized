@@ -12,7 +12,13 @@
 
 ViewEqualizer::ViewEqualizer(QWidget* parent) : QWidget(parent) {}
 
-ViewEqualizer::~ViewEqualizer() = default;
+ViewEqualizer::~ViewEqualizer()
+{
+    if (m_window) {
+        m_window->shutdown();
+        m_window = nullptr;
+    }
+}
 
 void ViewEqualizer::setVulkanContext(VulkanContext* ctx) {
     m_ctx = ctx;
@@ -39,16 +45,22 @@ void ViewEqualizer::setModel(EqualizerModel* model) {
 void ViewEqualizer::createVulkanWindow() {
     if (!m_ctx || !m_renderer) return;
 
+    qDebug() << "ViewEqualizer::createVulkanWindow: creating VulkanQtWindow...";
     m_window = new VulkanQtWindow(m_ctx, m_renderer);
-    m_window->setVulkanInstance(m_ctx->qtInstance());
-    m_window->setSurfaceType(QSurface::VulkanSurface);
-    m_window->create();
+    qDebug() << "ViewEqualizer::createVulkanWindow: VulkanQtWindow created, creating container...";
 
     m_vulkanContainer = QWidget::createWindowContainer(m_window, this);
     m_vulkanContainer->setGeometry(0, 0, width(), height());
     m_vulkanContainer->lower();
 
+    if (m_mapper) {
+        m_mapper->setViewport(QRectF(MARGIN_LEFT, MARGIN_TOP,
+                                      width() - MARGIN_LEFT - MARGIN_RIGHT,
+                                      height() - MARGIN_TOP - MARGIN_BOTTOM));
+    }
+
     m_initialized = true;
+    qDebug() << "ViewEqualizer::createVulkanWindow: complete, m_initialized=true";
 }
 
 void ViewEqualizer::connectSignals() {
@@ -172,10 +184,26 @@ void ViewEqualizer::onSampleRateChanged(SampleRate rate) {
     if (m_window) m_window->requestRender();
 }
 
+void ViewEqualizer::setVisible(bool visible)
+{
+    if (!visible && m_initialized) {
+        if (m_window) {
+            m_window->shutdown();
+        }
+        if (m_renderer) {
+            m_renderer->destroy();
+        }
+    }
+    QWidget::setVisible(visible);
+}
+
 void ViewEqualizer::resizeEvent(QResizeEvent* event) {
     QWidget::resizeEvent(event);
     if (m_mapper) {
-        m_mapper->setViewport(QRectF(0, 0, width(), height()));
+        QRectF innerRect(MARGIN_LEFT, MARGIN_TOP,
+                         width() - MARGIN_LEFT - MARGIN_RIGHT,
+                         height() - MARGIN_TOP - MARGIN_BOTTOM);
+        m_mapper->setViewport(innerRect);
     }
     if (m_vulkanContainer) {
         m_vulkanContainer->resize(size());

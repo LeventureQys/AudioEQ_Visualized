@@ -83,6 +83,7 @@ bool VulkanContext::initialize() {
     };
 
     VkPhysicalDeviceFeatures deviceFeatures = {};
+    deviceFeatures.wideLines = VK_TRUE;  // Required for curve rendering line width > 1.0
 
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

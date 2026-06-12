@@ -22,6 +22,7 @@ VkSurfaceFormatKHR VulkanSwapchain::chooseSurfaceFormat(VkPhysicalDevice pd, VkS
 }
 
 bool VulkanSwapchain::create(VkSurfaceKHR surface, QSize size) {
+    if (surface == VK_NULL_HANDLE) return false;
     m_surface = surface;
     VkPhysicalDevice pd = m_ctx->physicalDevice();
 
@@ -192,17 +193,18 @@ void VulkanSwapchain::destroy() {
 
     for (auto fb : m_framebuffers) vkDestroyFramebuffer(dev, fb, nullptr);
     m_framebuffers.clear();
-    if (m_renderPass) vkDestroyRenderPass(dev, m_renderPass, nullptr);
-    if (m_msaaView) vkDestroyImageView(dev, m_msaaView, nullptr);
-    if (m_msaaImage) vkDestroyImage(dev, m_msaaImage, nullptr);
-    if (m_msaaMemory) vkFreeMemory(dev, m_msaaMemory, nullptr);
+    if (m_renderPass) { vkDestroyRenderPass(dev, m_renderPass, nullptr); m_renderPass = VK_NULL_HANDLE; }
+    if (m_msaaView)   { vkDestroyImageView(dev, m_msaaView, nullptr);   m_msaaView = VK_NULL_HANDLE; }
+    if (m_msaaImage)  { vkDestroyImage(dev, m_msaaImage, nullptr);      m_msaaImage = VK_NULL_HANDLE; }
+    if (m_msaaMemory) { vkFreeMemory(dev, m_msaaMemory, nullptr);       m_msaaMemory = VK_NULL_HANDLE; }
     for (auto iv : m_imageViews) vkDestroyImageView(dev, iv, nullptr);
     m_imageViews.clear();
-    if (m_swapchain) vkDestroySwapchainKHR(dev, m_swapchain, nullptr);
-    m_swapchain = VK_NULL_HANDLE;
+    if (m_swapchain)  { vkDestroySwapchainKHR(dev, m_swapchain, nullptr); m_swapchain = VK_NULL_HANDLE; }
+    m_surface = VK_NULL_HANDLE;
 }
 
 bool VulkanSwapchain::resize(QSize newSize) {
+    if (m_surface == VK_NULL_HANDLE) return false;
     destroy();
     return create(m_surface, newSize);
 }

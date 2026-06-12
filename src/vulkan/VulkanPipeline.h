@@ -7,7 +7,7 @@ class VulkanContext;
 
 enum class PipelineType { Grid = 0, Curve, Fill, Glyph };
 
-class VulkanPipeline {
+class AUDIOEQ_EXPORT VulkanPipeline {
 public:
     explicit VulkanPipeline(VulkanContext* ctx);
     ~VulkanPipeline();

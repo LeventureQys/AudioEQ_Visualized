@@ -91,6 +91,8 @@ bool VulkanFontAtlas::initialize(float fontSize) {
     createAtlasTexture(ATLAS_WIDTH, ATLAS_HEIGHT, atlasData.data());
 
     qDebug() << "VulkanFontAtlas: Initialized" << m_glyphs.size() << "glyphs at" << fontSize << "px";
+    qDebug() << "VulkanFontAtlas: atlasView=" << (m_atlasView ? "yes" : "no") << "sampler=" << (m_sampler ? "yes" : "no");
+    qDebug() << "VulkanFontAtlas: FONT_SIZE=" << FONT_SIZE;
     return true;
 }
 
@@ -228,10 +230,10 @@ void VulkanFontAtlas::createAtlasTexture(int width, int height, const unsigned c
 void VulkanFontAtlas::destroy() {
     VkDevice dev = m_ctx ? m_ctx->device() : VK_NULL_HANDLE;
     if (!dev) return;
-    if (m_sampler)     vkDestroySampler(dev, m_sampler, nullptr);
-    if (m_atlasView)   vkDestroyImageView(dev, m_atlasView, nullptr);
-    if (m_atlasImage)  vkDestroyImage(dev, m_atlasImage, nullptr);
-    if (m_atlasMemory) vkFreeMemory(dev, m_atlasMemory, nullptr);
+    if (m_sampler)     { vkDestroySampler(dev, m_sampler, nullptr);     m_sampler = VK_NULL_HANDLE; }
+    if (m_atlasView)   { vkDestroyImageView(dev, m_atlasView, nullptr);   m_atlasView = VK_NULL_HANDLE; }
+    if (m_atlasImage)  { vkDestroyImage(dev, m_atlasImage, nullptr);      m_atlasImage = VK_NULL_HANDLE; }
+    if (m_atlasMemory) { vkFreeMemory(dev, m_atlasMemory, nullptr);       m_atlasMemory = VK_NULL_HANDLE; }
 }
 
 bool VulkanFontAtlas::glyphInfo(QChar ch, GlyphInfo* out) const {

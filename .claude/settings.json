@@ -37,7 +37,8 @@
       "Bash(findstr SimpleDemo)",
       "Bash(cmd //c \"taskkill /F /IM SimpleDemo.exe\")",
       "Bash(cmd //c \"dumpbin /HEADERS 'd:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/SimpleDemo.exe' 2>nul | findstr subsystem\")",
-      "Bash(cmd //c \"set QT_FORCE_STDERR_LOGGING=1 & d:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/SimpleDemo.exe > d:/tmp/stage11/run_v2_stdout.txt 2> d:/tmp/stage11/run_v2_stderr.txt\")"
+      "Bash(cmd //c \"set QT_FORCE_STDERR_LOGGING=1 & d:/workshop/Github/AudioEQ_Visualized/build/examples/SimpleDemo/Debug/SimpleDemo.exe > d:/tmp/stage11/run_v2_stdout.txt 2> d:/tmp/stage11/run_v2_stderr.txt\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"d:/tmp/stage11/screenshot.ps1\" \"d:/tmp/stage11/after_fix6.png\")"
     ]
   }
 }

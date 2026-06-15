@@ -22,6 +22,7 @@ public:
     QPoint center() const;
 
     int bandIndex() const;
+    bool isDragging() const;
 
     static constexpr int HANDLE_RADIUS = 20;
 
@@ -38,7 +39,7 @@ protected:
 
     void firePendingDrag();
 
-    QPoint  m_lastEmitPos;
+    QPoint  m_lastGlobalPos;
     bool    m_dragging    = false;
     QTimer  m_throttleTimer;
     QPoint  m_pendingDelta;

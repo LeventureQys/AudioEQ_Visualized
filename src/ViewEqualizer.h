@@ -56,6 +56,8 @@ signals:
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
+    void moveEvent(QMoveEvent* event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
     void setVisible(bool visible) override;
 
 private slots:

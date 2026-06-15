@@ -30,7 +30,7 @@ public:
 
 private:
     QRectF  m_viewport;
-    double  m_gainMin = -18.0;
+    double  m_gainMin = -24.0;
     double  m_gainMax = +12.0;
     double  m_freqMin = 20.0;
     double  m_freqMax = 22050.0;

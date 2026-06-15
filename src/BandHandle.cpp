@@ -7,8 +7,7 @@ BandHandle::BandHandle(int bandIndex, QWidget* parent)
     : QWidget(parent)
     , m_bandIndex(bandIndex)
 {
-    // Frameless top-level overlay so it can be drawn on top of the Vulkan child window
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_ShowWithoutActivating, true);
@@ -29,6 +28,10 @@ QPoint BandHandle::center() const {
 
 int BandHandle::bandIndex() const {
     return m_bandIndex;
+}
+
+bool BandHandle::isDragging() const {
+    return m_dragging;
 }
 
 void BandHandle::paintEvent(QPaintEvent*) {
@@ -65,7 +68,7 @@ void BandHandle::mousePressEvent(QMouseEvent* event) {
 
     m_dragging = true;
     m_dragStartPos = event->pos();
-    m_lastEmitPos = event->pos();
+    m_lastGlobalPos = event->globalPos();
     m_hasPending = false;
 
     emit bandClicked(m_bandIndex);
@@ -75,17 +78,21 @@ void BandHandle::mousePressEvent(QMouseEvent* event) {
 void BandHandle::mouseMoveEvent(QMouseEvent* event) {
     if (!m_dragging) return;
 
-    QPoint currentPos = event->pos();
-    QPoint delta = currentPos - m_lastEmitPos;
+    QPoint globalCurrent = event->globalPos();
+    QPoint delta = globalCurrent - m_lastGlobalPos;
+
+    if (delta.x() == 0 && delta.y() == 0) return;
+
+    m_lastGlobalPos = globalCurrent;
 
     if (!m_throttleTimer.isActive()) {
+        QPoint curGlobal = mapToGlobal(QPoint(0, 0));
+        move(curGlobal.x() + delta.x(), curGlobal.y() + delta.y());
         emit bandDragged(m_bandIndex, delta.x(), delta.y());
-        m_lastEmitPos = currentPos;
         m_throttleTimer.start(16);
         m_hasPending = false;
     } else {
-        m_pendingDelta += (currentPos - m_lastEmitPos);
-        m_lastEmitPos = currentPos;
+        m_pendingDelta += delta;
         m_hasPending = true;
     }
 
@@ -108,6 +115,8 @@ void BandHandle::mouseReleaseEvent(QMouseEvent* event) {
 
 void BandHandle::firePendingDrag() {
     if (m_hasPending) {
+        QPoint curGlobal = mapToGlobal(QPoint(0, 0));
+        move(curGlobal.x() + m_pendingDelta.x(), curGlobal.y() + m_pendingDelta.y());
         emit bandDragged(m_bandIndex, m_pendingDelta.x(), m_pendingDelta.y());
         m_pendingDelta = QPoint(0, 0);
         m_hasPending = false;

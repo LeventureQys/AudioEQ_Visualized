@@ -9,6 +9,8 @@
 #include "CoordinateMapper.h"
 #include <QVBoxLayout>
 #include <QResizeEvent>
+#include <QShowEvent>
+#include <QMoveEvent>
 
 ViewEqualizer::ViewEqualizer(QWidget* parent) : QWidget(parent) {}
 
@@ -60,6 +62,9 @@ void ViewEqualizer::createVulkanWindow() {
     }
 
     m_initialized = true;
+    if (auto* w = window()) {
+        w->installEventFilter(this);
+    }
     qDebug() << "ViewEqualizer::createVulkanWindow: complete, m_initialized=true";
 }
 
@@ -116,7 +121,6 @@ void ViewEqualizer::updateBandHandlePosition(int index, QPoint pos) {
     if (index < 0 || index >= m_bandHandles.size()) return;
     auto* h = m_bandHandles[index];
     h->setCenter(pos);
-    // BandHandle is a frameless top-level overlay → translate parent-local pos to global screen coords
     QPoint globalCenter = mapToGlobal(pos);
     h->move(globalCenter.x() - HANDLE_RADIUS, globalCenter.y() - HANDLE_RADIUS);
     h->resize(HANDLE_RADIUS * 2, HANDLE_RADIUS * 2);
@@ -134,6 +138,10 @@ VulkanRenderer* ViewEqualizer::vulkanRenderer() const { return m_renderer; }
 
 void ViewEqualizer::onBandChanged(int index) {
     if (!m_model || !m_mapper) return;
+    if (index >= 0 && index < m_bandHandles.size() && m_bandHandles[index]->isDragging()) {
+        if (m_window) m_window->requestRender();
+        return;
+    }
     EQBand b = m_model->band(index);
     QPointF pixel = m_mapper->toPixel(b.freqHz, b.gainDb);
     updateBandHandlePosition(index, pixel.toPoint());
@@ -155,11 +163,13 @@ void ViewEqualizer::onLpfChanged() {
     ShelfBand lpf = m_model->lpf();
     setLpfHandleVisible(lpf.enabled);
     if (lpf.enabled) {
-        double x = m_mapper->freqToX(lpf.freqHz);
-        double y = m_mapper->gainToY(0.0);
-        m_lpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        m_lpfHandle->move(g.x() - 20, g.y() - 12);
+        if (!m_lpfHandle->isDragging()) {
+            double x = m_mapper->freqToX(lpf.freqHz);
+            double y = m_mapper->gainToY(0.0);
+            m_lpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
+            QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
+            m_lpfHandle->move(g.x() - 20, g.y() - 12);
+        }
         m_lpfHandle->raise();
     }
     if (m_window) m_window->requestRender();
@@ -170,11 +180,13 @@ void ViewEqualizer::onHpfChanged() {
     ShelfBand hpf = m_model->hpf();
     setHpfHandleVisible(hpf.enabled);
     if (hpf.enabled) {
-        double x = m_mapper->freqToX(hpf.freqHz);
-        double y = m_mapper->gainToY(0.0);
-        m_hpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
-        m_hpfHandle->move(g.x() - 20, g.y() - 12);
+        if (!m_hpfHandle->isDragging()) {
+            double x = m_mapper->freqToX(hpf.freqHz);
+            double y = m_mapper->gainToY(0.0);
+            m_hpfHandle->setCenter(QPoint(static_cast<int>(x), static_cast<int>(y)));
+            QPoint g = mapToGlobal(QPoint(static_cast<int>(x), static_cast<int>(y)));
+            m_hpfHandle->move(g.x() - 20, g.y() - 12);
+        }
         m_hpfHandle->raise();
     }
     if (m_window) m_window->requestRender();
@@ -213,6 +225,18 @@ void ViewEqualizer::resizeEvent(QResizeEvent* event) {
         m_vulkanContainer->resize(size());
     }
     repositionAllHandles();
+}
+
+void ViewEqualizer::moveEvent(QMoveEvent* event) {
+    QWidget::moveEvent(event);
+    repositionAllHandles();
+}
+
+bool ViewEqualizer::eventFilter(QObject* obj, QEvent* event) {
+    if (event->type() == QEvent::Move) {
+        repositionAllHandles();
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
 void ViewEqualizer::repositionAllHandles() {

@@ -14,6 +14,7 @@ constexpr FreqTick FREQ_TICKS[] = {
     {   100.0, "100Hz"   },
     {   200.0, "200Hz"   },
     {   500.0, "500Hz"   },
+    {  1000.0, "1KHz"    },
     {  2000.0, "2KHz"    },
     {  5000.0, "5KHz"    },
     { 10000.0, "10KHz"   },
@@ -387,14 +388,17 @@ QVector<float> VulkanRenderer::buildAxisVBO()
         verts.append(x2); verts.append(y2);
     };
 
-    // L-shape: left axis + bottom axis only
-    addLine(leftNdc, topNdc,    leftNdc, bottomNdc);    // left axis
-    addLine(leftNdc, bottomNdc, rightNdc, bottomNdc);   // bottom axis
+    // Left axis (vertical)
+    addLine(leftNdc, topNdc, leftNdc, bottomNdc);
 
+    // Bottom axis (horizontal) at 0dB line, not at the bottom edge
     if (m_mapper && m_mapper->gainMin() <= 0.0 && m_mapper->gainMax() >= 0.0) {
         float py = static_cast<float>(m_mapper->gainToY(0.0));
         float zeroNy = toNdcY(py);
         addLine(leftNdc, zeroNy, rightNdc, zeroNy);
+    } else {
+        // Fallback: use bottom edge if 0dB is not in range
+        addLine(leftNdc, bottomNdc, rightNdc, bottomNdc);
     }
 
     return verts;
@@ -460,9 +464,9 @@ void VulkanRenderer::buildTextGeometry()
         }
         float xBase = px - textWidth / 2.0f;
 
-        // Freq labels sit in the bottom margin (below the L-shape bottom axis), matching target style
-        float bottomAxisY = static_cast<float>(m_size.height()) - MARGIN_BOTTOM;
-        float yBase = bottomAxisY + FREQ_LABEL_Y_OFFSET_PX + fontSize;
+        // Freq labels sit below the 0dB axis line
+        float zeroDbY = static_cast<float>(m_mapper->gainToY(0.0));
+        float yBase = zeroDbY + FREQ_LABEL_Y_OFFSET_PX + fontSize;
 
         yBase = (std::min)(yBase, static_cast<float>(m_size.height()) - 2.0f);
 

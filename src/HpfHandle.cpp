@@ -36,7 +36,7 @@ void HpfHandle::mousePressEvent(QMouseEvent* event) {
         return;
     }
     m_dragging = true;
-    m_lastEmitPos = event->pos();
+    m_lastGlobalPos = event->globalPos();
     m_hasPending = false;
     emit bandClicked(bandIndex());
     event->accept();
@@ -44,15 +44,21 @@ void HpfHandle::mousePressEvent(QMouseEvent* event) {
 
 void HpfHandle::mouseMoveEvent(QMouseEvent* event) {
     if (!m_dragging) return;
-    QPoint delta = event->pos() - m_lastEmitPos;
-    m_lastEmitPos = event->pos();
+    QPoint globalCurrent = event->globalPos();
+    QPoint delta = globalCurrent - m_lastGlobalPos;
+
+    if (delta.x() == 0) return;
 
     if (!m_throttleTimer.isActive()) {
+        QPoint curGlobal = mapToGlobal(QPoint(0, 0));
+        move(curGlobal.x() + delta.x(), curGlobal.y() + delta.y());
         emit hpfDragged(delta.x());
+        m_lastGlobalPos = globalCurrent;
         m_throttleTimer.start(16);
         m_hasPending = false;
     } else {
         m_pendingDelta += delta;
+        m_lastGlobalPos = globalCurrent;
         m_hasPending = true;
     }
     event->accept();
@@ -63,6 +69,8 @@ void HpfHandle::mouseReleaseEvent(QMouseEvent* event) {
     m_dragging = false;
     m_throttleTimer.stop();
     if (m_hasPending) {
+        QPoint curGlobal = mapToGlobal(QPoint(0, 0));
+        move(curGlobal.x() + m_pendingDelta.x(), curGlobal.y() + m_pendingDelta.y());
         emit hpfDragged(m_pendingDelta.x());
         m_pendingDelta = QPoint(0, 0);
         m_hasPending = false;
